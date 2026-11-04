@@ -55,6 +55,7 @@ function GameTooltip_Hide()
 	GameTooltip:Hide()
 end
 SOUNDKIT.UI_PROFESSIONS_NEW_RECIPE_LEARNED_TOAST = 1
+OKAY = "Okay"
 SOUNDKIT.IG_CHARACTER_INFO_TAB = SOUNDKIT.IG_CHARACTER_INFO_TAB or 841
 
 C_Item.GetItemNameByID = function(id)

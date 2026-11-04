@@ -13,7 +13,7 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 - **Al craftear** baja la cantidad sola. Cuando llega a cero, te avisa y la saca.
 - **En el tooltip** de un material: "Taller: necesitás 20, tenés 3 acá y 12 en Ana".
 - **Planos de campamento:** la pestaña "Planos" muestra los 21 planos por profesión: cuáles aprendió cada uno de tus personajes, cuáles tenés guardados sin aprender, cuáles faltan, y qué jefe los tira. En el tooltip de un plano te dice si ya lo aprendió alguno de tus personajes. El juego no lleva esta cuenta. Los datos (qué jefe tira cada uno) salen de las guías de la beta; para 10 de los 21 todavía no se sabe ⏳.
-- `/taller` abre la ventana, `/taller compras` va directo a la lista de compras y `/taller planos` a los planos.
+- `/taller` abre la ventana, `/taller compras` va directo a la lista de compras, `/taller planos` a los planos y `/taller copiar` te da lo que falta como texto ("15x Paño de lino, 4x Hilo grueso") para pasárselo a alguien de la guild.
 
 Las recetas son de quien las sabe hacer: si pineás algo con tu alt herrero, lo ves desde cualquier personaje ("la hace Ana").
 
@@ -38,7 +38,7 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 **Probado:**
 - ✅ Cada función, evento, template y sonido existe en Forever 1.60.1: `tools/check_api.py` contra los dumps de [Ketho/BlizzardInterfaceResources](https://github.com/Ketho/BlizzardInterfaceResources) y la UI de [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), rama `forever`. Forever usa la API de profesiones moderna (`C_TradeSkillUI.GetRecipeSchematic`, `TRACKED_RECIPE_UPDATE`) y el banco por pestañas (`Enum.BagIndex.CharacterBankTab_*`, `AccountBankTab_*`).
 - ✅ [forever-lint](https://github.com/JoseArgento/forever-lint) sin problemas; [Addon Sentry](https://github.com/JoseArgento/addon-sentry): "Sin señales de riesgo".
-- ✅ **30 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados.
+- ✅ **31 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados.
 
 **Sin probar ⏳** (no tengo el cliente de Forever):
 - Cómo se ve la ventana.

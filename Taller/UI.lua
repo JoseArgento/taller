@@ -152,6 +152,40 @@ local function initRow(row, item)
 	row.right:SetShown(not isPin)
 end
 
+-- The shopping list as text, to paste in a whisper or for a guildmate who gathers: "20x Linen Cloth (10 missing)".
+function UI.ShoppingText()
+	local lines = {}
+	for _, item in ipairs(ns.Pins.Shopping()) do
+		if item.missing > 0 then
+			lines[#lines + 1] = L.COPY_LINE:format(item.missing, ns.ItemName(item.item))
+		end
+	end
+	return #lines > 0 and table.concat(lines, ", ") or L.COPY_NOTHING
+end
+
+StaticPopupDialogs.TALLER_COPY = {
+	text = "%s",
+	button1 = OKAY,
+	hasEditBox = 1,
+	editBoxWidth = 350,
+	OnShow = function(dialog, data)
+		local edit = dialog:GetEditBox()
+		edit:SetText(data or "")
+		edit:HighlightText()
+		edit:SetFocus()
+	end,
+	EditBoxOnEscapePressed = function(editBox)
+		editBox:GetParent():Hide()
+	end,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1,
+}
+
+function UI.Copy()
+	StaticPopup_Show("TALLER_COPY", L.COPY_PROMPT, nil, UI.ShoppingText())
+end
+
 local function build()
 	local FRAME = ADDON .. "Frame"
 	local f = CreateFrame("Frame", FRAME, UIParent, "BasicFrameTemplateWithInset")
@@ -205,6 +239,12 @@ local function build()
 	ScrollUtil.InitScrollBoxListWithScrollBar(box, bar, view)
 	UI.box = box
 
+	f.copy = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.copy:SetSize(120, 20)
+	f.copy:SetPoint("TOPRIGHT", -30, -1)
+	f.copy:SetText(L.COPY)
+	f.copy:SetScript("OnClick", UI.Copy)
+
 	f.empty = f:CreateFontString(nil, "OVERLAY", "GameFontDisable")
 	f.empty:SetPoint("TOPLEFT", 24, -48)
 	f.empty:SetPoint("TOPRIGHT", -24, -48)
@@ -234,6 +274,7 @@ function UI.Refresh()
 	end
 	UI.rows = UI.Rows()
 	f.empty:SetShown(#ns.db.pins == 0 and UI.mode ~= "blueprints")
+	f.copy:SetShown(UI.mode == "shopping" and #ns.db.pins > 0)
 	UI.box:SetDataProvider(CreateDataProvider(UI.rows), ScrollBoxConstants.RetainScrollPosition)
 end
 

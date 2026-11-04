@@ -88,6 +88,8 @@ SlashCmdList.TALLER = function(msg)
 	msg = strtrim((msg or ""):lower())
 	if msg == "compras" or msg == "shopping" then
 		ns.UI.Toggle("shopping")
+	elseif msg == "copiar" or msg == "copy" then
+		ns.UI.Copy()
 	elseif msg == "planos" or msg == "blueprints" then
 		ns.UI.Toggle("blueprints")
 	elseif msg == "help" or msg == "ayuda" then

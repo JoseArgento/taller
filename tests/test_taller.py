@@ -362,3 +362,14 @@ def test_blueprints_in_spanish():
     c.run("ns.UI.Toggle('blueprints')")
     headers = [left for kind, left, _ in c.rows() if kind == "header"]
     assert headers[0] == "Alquimia" and "Primeros auxilios" in headers
+
+
+def test_copy_the_shopping_list(me):
+    me.pin(2963, 10)
+    me.put(0, 2589, 5)
+    me.bags_changed()
+    assert me.ns.UI.ShoppingText() == "15x Linen Cloth"
+    me.lua.globals().SlashCmdList.TALLER("copiar")
+    me.put(0, 2589, 15)
+    me.bags_changed()
+    assert me.ns.UI.ShoppingText() == "Nothing missing."
