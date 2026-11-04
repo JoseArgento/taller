@@ -4,6 +4,16 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 
 [Read in English](README.en.md)
 
+**Contenido**
+
+- [Cómo se usa](#cómo-se-usa)
+- [Qué cuenta](#qué-cuenta)
+- [Instalar](#instalar)
+- [¿Por qué otro más?](#por-qué-otro-más)
+- [Cómo se probó](#cómo-se-probó)
+- [Desarrollo](#desarrollo)
+- [Apoyar](#apoyar)
+
 ## Cómo se usa
 
 - **Pinear:** en la ventana de profesiones del juego, tildá la casilla para seguir la receta. Aparece sola en Taller. Si la destildás, se despinea; si la despineás en Taller, se destilda.
@@ -60,3 +70,7 @@ Un tag `v*` empaqueta el addon con el packager de BigWigs.
 Sin relación con Blizzard Entertainment. World of Warcraft es marca registrada de Blizzard Entertainment, Inc. Licencia MIT.
 
 Fuentes de los planos: [mmonster.co](https://mmonster.co/wow-forever/guides/professions/camping) · [wow-professions.com](https://www.wow-professions.com/forever/camping-guide) (datos de la beta).
+
+## Apoyar
+
+Todo esto es gratis y de código abierto, y va a seguir así: no hay funciones pagas ni nada antes para quien aporta. Si te sirvió y querés bancar el tiempo de mantenerlo (con cada parche de Blizzard hay que actualizar los datos y arreglar lo que se rompe), podés hacerlo en [Patreon](https://www.patreon.com/cw/DoblePupi). Gracias ♥
