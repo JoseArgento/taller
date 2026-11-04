@@ -16,6 +16,7 @@ Locales.lua
 Core.lua
 Inventory.lua
 Pins.lua
+Blueprints.lua
 UI.lua
 Tooltip.lua
 Events.lua

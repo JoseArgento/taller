@@ -31,6 +31,21 @@ local L = {
 	COMPARTMENT = "Click to open your crafting list.",
 	OTHER = "Other",
 	UNKNOWN_ITEM = "item %d",
+	BLUEPRINTS = "Blueprints",
+	BP_NAME = "%s  (tier %d, skill %d)",
+	BP_LEARNED = "learned: %s",
+	BP_CARRIED = "%s has it, not learned",
+	BP_MISSING = "missing",
+	BP_SOURCE = "%s, %s",
+	BP_SOURCE_UNKNOWN = "drop not known yet",
+	BP_COUNT = "Blueprints missing: %d of %d. Open each profession once so learned ones count.",
+	BP_TIP_LEARNED = "Taller: learned by %s",
+	BP_TIP_NONE = "Taller: none of your characters learned it",
+	BP_TIP_SOURCE = "Drops from %s (%s), per the beta",
+	PROF_ALCHEMY = "Alchemy", PROF_BLACKSMITHING = "Blacksmithing", PROF_ENCHANTING = "Enchanting",
+	PROF_ENGINEERING = "Engineering", PROF_HERBALISM = "Herbalism", PROF_LEATHERWORKING = "Leatherworking",
+	PROF_MINING = "Mining", PROF_SKINNING = "Skinning", PROF_TAILORING = "Tailoring",
+	PROF_FIRSTAID = "First Aid", PROF_FISHING = "Fishing",
 }
 
 local es = {
@@ -63,6 +78,21 @@ local es = {
 	COMPARTMENT = "Clic para abrir tu lista de crafteos.",
 	OTHER = "Otras",
 	UNKNOWN_ITEM = "objeto %d",
+	BLUEPRINTS = "Planos",
+	BP_NAME = "%s  (nivel %d, habilidad %d)",
+	BP_LEARNED = "aprendido: %s",
+	BP_CARRIED = "lo tiene %s, sin aprender",
+	BP_MISSING = "falta",
+	BP_SOURCE = "%s, %s",
+	BP_SOURCE_UNKNOWN = "todavía no se sabe quién lo tira",
+	BP_COUNT = "Planos que faltan: %d de %d. Abrí cada profesión una vez para que cuenten los aprendidos.",
+	BP_TIP_LEARNED = "Taller: lo aprendió %s",
+	BP_TIP_NONE = "Taller: ninguno de tus personajes lo aprendió",
+	BP_TIP_SOURCE = "Lo tira %s (%s), según la beta",
+	PROF_ALCHEMY = "Alquimia", PROF_BLACKSMITHING = "Herrería", PROF_ENCHANTING = "Encantamiento",
+	PROF_ENGINEERING = "Ingeniería", PROF_HERBALISM = "Herboristería", PROF_LEATHERWORKING = "Peletería",
+	PROF_MINING = "Minería", PROF_SKINNING = "Desuello", PROF_TAILORING = "Sastrería",
+	PROF_FIRSTAID = "Primeros auxilios", PROF_FISHING = "Pesca",
 }
 
 local locale = GetLocale()

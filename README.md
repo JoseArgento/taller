@@ -12,7 +12,8 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 - **Lista de compras:** la otra pestaña suma todo lo que piden tus recetas, con lo que más falta arriba. Si un material lo hace otra receta tuya (el paño para la camisa), te lo marca.
 - **Al craftear** baja la cantidad sola. Cuando llega a cero, te avisa y la saca.
 - **En el tooltip** de un material: "Taller: necesitás 20, tenés 3 acá y 12 en Ana".
-- `/taller` abre la ventana, `/taller compras` va directo a la lista de compras.
+- **Planos de campamento:** la pestaña "Planos" muestra los 21 planos por profesión: cuáles aprendió cada uno de tus personajes, cuáles tenés guardados sin aprender, cuáles faltan, y qué jefe los tira. En el tooltip de un plano te dice si ya lo aprendió alguno de tus personajes. El juego no lleva esta cuenta. Los datos (qué jefe tira cada uno) salen de las guías de la beta; para 10 de los 21 todavía no se sabe ⏳.
+- `/taller` abre la ventana, `/taller compras` va directo a la lista de compras y `/taller planos` a los planos.
 
 Las recetas son de quien las sabe hacer: si pineás algo con tu alt herrero, lo ves desde cualquier personaje ("la hace Ana").
 
@@ -37,13 +38,14 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 **Probado:**
 - ✅ Cada función, evento, template y sonido existe en Forever 1.60.1: `tools/check_api.py` contra los dumps de [Ketho/BlizzardInterfaceResources](https://github.com/Ketho/BlizzardInterfaceResources) y la UI de [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), rama `forever`. Forever usa la API de profesiones moderna (`C_TradeSkillUI.GetRecipeSchematic`, `TRACKED_RECIPE_UPDATE`) y el banco por pestañas (`Enum.BagIndex.CharacterBankTab_*`, `AccountBankTab_*`).
 - ✅ [forever-lint](https://github.com/JoseArgento/forever-lint) sin problemas; [Addon Sentry](https://github.com/JoseArgento/addon-sentry): "Sin señales de riesgo".
-- ✅ **24 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados.
+- ✅ **30 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados.
 
 **Sin probar ⏳** (no tengo el cliente de Forever):
 - Cómo se ve la ventana.
 - Que la casilla para seguir recetas de Forever dispare `TRACKED_RECIPE_UPDATE` como en retail.
 - Que el banco de Forever use las pestañas de banco modernas y que el de cuenta exista.
 - Que `UNIT_SPELLCAST_SUCCEEDED` traiga el ID de la receta al craftear (así es en retail).
+- Los planos: que la receta que enseña cada plano dé como resultado el objeto de campamento (así los reconoce), y qué jefe tira los 10 que faltan.
 
 ## Desarrollo
 
@@ -56,3 +58,5 @@ python tools/check_api.py --bir ../BlizzardInterfaceResources --ui ../wow-ui-sou
 Un tag `v*` empaqueta el addon con el packager de BigWigs.
 
 Sin relación con Blizzard Entertainment. World of Warcraft es marca registrada de Blizzard Entertainment, Inc. Licencia MIT.
+
+Fuentes de los planos: [mmonster.co](https://mmonster.co/wow-forever/guides/professions/camping) · [wow-professions.com](https://www.wow-professions.com/forever/camping-guide) (datos de la beta).

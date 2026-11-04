@@ -24,6 +24,18 @@ end
 -- Rows for the list, from the pins.
 function UI.Rows()
 	local rows = {}
+	if UI.mode == "blueprints" then
+		local bp = ns.Blueprints.Rows()
+		rows[#rows + 1] = { kind = "note", text = L.BP_COUNT:format(bp.missing, bp.total) }
+		for _, r in ipairs(bp) do
+			if r.header then
+				rows[#rows + 1] = { kind = "header", text = r.header }
+			else
+				rows[#rows + 1] = { kind = "bp", bp = r }
+			end
+		end
+		return rows
+	end
 	if UI.mode == "shopping" then
 		for _, s in ipairs(ns.Pins.Shopping()) do
 			rows[#rows + 1] = { kind = "reagent", item = s.item, need = s.need, have = s.have }
@@ -44,8 +56,10 @@ end
 
 -- What a row says, as plain data (the tests read this; the window draws it).
 function UI.Describe(row)
-	if row.kind == "header" then
+	if row.kind == "header" or row.kind == "note" then
 		return { left = row.text }
+	elseif row.kind == "bp" then
+		return { left = "    " .. row.bp.left .. "  " .. GREY .. row.bp.source .. "|r", right = row.bp.status }
 	elseif row.kind == "pin" then
 		local p = row.pin
 		local who = p.crafter ~= ns.CharKey() and ("  " .. GREY .. L.CRAFTER:format(ns.Short(p.crafter)) .. "|r") or ""
@@ -68,6 +82,12 @@ end
 
 local function rowTooltip(row)
 	local item = row.item
+	if item and item.kind == "bp" then
+		GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+		GameTooltip:SetItemByID(item.bp.e.item)
+		GameTooltip:Show()
+		return
+	end
 	if not item or not item.item then
 		return
 	end
@@ -122,7 +142,7 @@ local function initRow(row, item)
 		row:SetScript("OnLeave", GameTooltip_Hide)
 	end
 	local d = UI.Describe(item)
-	row.left:SetFontObject(item.kind == "reagent" and "GameFontHighlightSmall" or "GameFontNormal")
+	row.left:SetFontObject((item.kind == "reagent" or item.kind == "bp") and "GameFontHighlightSmall" or item.kind == "note" and "GameFontDisableSmall" or "GameFontNormal")
 	row.left:SetText(d.left)
 	row.right:SetText(d.right or "")
 	local isPin = item.kind == "pin"
@@ -151,10 +171,12 @@ local function build()
 	UI.frame = f
 
 	f.tabs = {}
-	for i, mode in ipairs({ "profession", "shopping" }) do
+	UI.MODES = { "profession", "shopping", "blueprints" }
+	local TAB_TEXT = { profession = L.BY_PROFESSION, shopping = L.SHOPPING, blueprints = L.BLUEPRINTS }
+	for i, mode in ipairs(UI.MODES) do
 		local tab = CreateFrame("Button", FRAME .. "Tab" .. i, f, "PanelTabButtonTemplate")
 		tab:SetID(i)
-		tab:SetText(mode == "shopping" and L.SHOPPING or L.BY_PROFESSION)
+		tab:SetText(TAB_TEXT[mode])
 		if i == 1 then
 			tab:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 8, 2)
 		else
@@ -166,7 +188,7 @@ local function build()
 		end)
 		f.tabs[i] = tab
 	end
-	PanelTemplates_SetNumTabs(f, 2)
+	PanelTemplates_SetNumTabs(f, #UI.MODES)
 
 	local box = CreateFrame("Frame", nil, f, "WowScrollBoxList")
 	box:SetPoint("TOPLEFT", 12, -32)
@@ -205,9 +227,13 @@ function UI.Refresh()
 	if not f or not f:IsShown() then
 		return
 	end
-	PanelTemplates_SetTab(f, UI.mode == "shopping" and 2 or 1)
+	for i, mode in ipairs(UI.MODES) do
+		if mode == UI.mode then
+			PanelTemplates_SetTab(f, i)
+		end
+	end
 	UI.rows = UI.Rows()
-	f.empty:SetShown(#ns.db.pins == 0)
+	f.empty:SetShown(#ns.db.pins == 0 and UI.mode ~= "blueprints")
 	UI.box:SetDataProvider(CreateDataProvider(UI.rows), ScrollBoxConstants.RetainScrollPosition)
 end
 
@@ -229,3 +255,4 @@ end
 
 ns.On("pins", UI.Refresh)
 ns.On("inventory", UI.Refresh)
+ns.On("blueprints", UI.Refresh)

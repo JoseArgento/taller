@@ -8,12 +8,13 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 - **Shopping list:** everything your recipes need, added up, most missing first. If another recipe of yours makes a material, it says so.
 - **When you craft** the quantity goes down by itself; at zero you get a message and it's unpinned.
 - **Item tooltips:** "Taller: 20 needed, 3 here, 12 on Ana".
-- `/taller` opens it, `/taller compras` (or `shopping`) goes to the shopping list.
+- **Camping blueprints:** a Blueprints tab lists all 21 by profession: which of your characters learned each, which you carry unlearned, which are missing, and who drops them (beta data; 10 sources not known yet). Blueprint tooltips say whether any of your characters learned it.
+- `/taller` opens it, `/taller planos` (or `blueprints`) the blueprints, `/taller compras` (or `shopping`) goes to the shopping list.
 
 **What it counts:** bags (and the reagent bag) always; your bank and the account bank as you last saw them; other characters as of your last login with them. Not the mailbox or the auction house.
 
 **Why another one:** *Forever Profession Master* has a queue with quantities but only counts bags; *ItemWatch & Shopping List* counts bags and bank but not alts; *ForeverArtisan* counts alts with an extra bag addon. Taller does one thing: what you want to craft against everything you own, on every character, with nothing else needed.
 
-**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 24 tests in Lua 5.1 with several characters sharing the saved data. **Not tested in the game**: how the window looks, that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, and that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting.
+**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 30 tests in Lua 5.1 with several characters sharing the saved data. **Not tested in the game**: how the window looks, that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, and that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting.
 
 Not affiliated with Blizzard Entertainment. MIT license.

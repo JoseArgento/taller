@@ -17,6 +17,19 @@ local function bagsSoon()
 	end)
 end
 
+-- A profession window lists its recipes in bursts: look for camp objects once it settles.
+local scanPending = false
+local function scanSoon()
+	if scanPending then
+		return
+	end
+	scanPending = true
+	C_Timer.After(1, function()
+		scanPending = false
+		ns.Blueprints.ScanRecipes()
+	end)
+end
+
 local handlers = {
 	BAG_UPDATE_DELAYED = bagsSoon,
 	PLAYERBANKSLOTS_CHANGED = bagsSoon,
@@ -37,6 +50,12 @@ local handlers = {
 		if unit == "player" and spellID and not issecretvalue(spellID) then
 			ns.Pins.OnCrafted(spellID)
 		end
+	end,
+	TRADE_SKILL_LIST_UPDATE = function()
+		scanSoon()
+	end,
+	NEW_RECIPE_LEARNED = function()
+		scanSoon()
 	end,
 	GET_ITEM_INFO_RECEIVED = function()
 		ns.Fire("inventory") -- an item name arrived: redraw
@@ -69,6 +88,8 @@ SlashCmdList.TALLER = function(msg)
 	msg = strtrim((msg or ""):lower())
 	if msg == "compras" or msg == "shopping" then
 		ns.UI.Toggle("shopping")
+	elseif msg == "planos" or msg == "blueprints" then
+		ns.UI.Toggle("blueprints")
 	elseif msg == "help" or msg == "ayuda" then
 		ns.Print(L.HELP)
 	else

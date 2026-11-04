@@ -109,6 +109,20 @@ C_TradeSkillUI = {
 		MOCK.tracked[id] = tracked or nil
 		MOCK.fire("TRACKED_RECIPE_UPDATE", id, tracked)
 	end,
+	GetAllRecipeIDs = function()
+		local out = {}
+		for id in pairs(MOCK.recipes) do
+			out[#out + 1] = id
+		end
+		table.sort(out)
+		return out
+	end,
+	GetRecipeInfo = function(id)
+		local r = MOCK.recipes[id]
+		if r then
+			return { recipeID = id, name = r.name, learned = r.learned ~= false, categoryID = 0 }
+		end
+	end,
 	GetRecipesTracked = function(isRecraft)
 		assert(isRecraft == false, "GetRecipesTracked(isRecraft)")
 		local out = {}

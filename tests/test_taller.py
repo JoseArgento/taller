@@ -295,3 +295,70 @@ def test_compartment(me):
     assert me.ns.UI.frame.IsShown(me.ns.UI.frame)
     g.Taller_OnAddonCompartmentEnter(None, me.ns.UI.frame)
     g.Taller_OnAddonCompartmentLeave()
+
+
+# blueprints (#37) -------------------------------------------------------------------------------
+
+
+def bp_rows(c):
+    r = c.ns.Blueprints.Rows()
+    return {r[i].e.name: r[i].status for i in range(1, len(r) + 1) if r[i].e}
+
+
+def test_blueprints_start_missing(me):
+    rows = bp_rows(me)
+    assert len(rows) == 21
+    assert all("missing" in s for s in rows.values())
+
+
+def test_a_learned_camp_object_is_found_in_the_profession_window(me):
+    # the Anvil blueprint teaches a recipe that makes the Anvil camp object (279988)
+    me.run("MOCK.recipes[999001] = { name = 'Anvil', output = 279988, per = 1, profession = 'Blacksmithing', reagents = {} }")
+    me.run(
+        "MOCK.recipes[999002] = { name = 'Master Forge', output = 279955, per = 1, profession = 'Blacksmithing', reagents = {}, learned = false }"
+    )
+    me.fire("TRADE_SKILL_LIST_UPDATE")
+    me.fire("TRADE_SKILL_LIST_UPDATE")  # in bursts: one scan
+    me.m.runTimers()
+    rows = bp_rows(me)
+    assert "learned: Josecito" in rows["Anvil"]
+    assert "missing" in rows["Master Forge"]  # listed but not learned
+
+
+def test_a_blueprint_in_the_bags_of_an_alt():
+    a = Client("Ana").login()
+    a.put(0, 273099, 1)  # Spinning Wheel blueprint
+    a.bags_changed()
+    b = Client("Josecito", saved=a.save()).login()
+    assert "Ana has it, not learned" in bp_rows(b)["Spinning Wheel"]
+
+
+def test_learned_on_an_alt_shows_on_every_character():
+    a = Client("Ana").login()
+    a.run("MOCK.recipes[999001] = { name = 'Anvil', output = 279988, per = 1, profession = 'Blacksmithing', reagents = {} }")
+    a.ns.Blueprints.ScanRecipes()
+    b = Client("Josecito", saved=a.save()).login()
+    assert "learned: Ana" in bp_rows(b)["Anvil"]
+
+
+def test_blueprint_tab_and_tooltip(me):
+    me.lua.globals().SlashCmdList.TALLER("planos")
+    assert me.ns.UI.mode == "blueprints"
+    kinds = [k for k, _, _ in me.rows()]
+    assert kinds[0] == "note" and kinds.count("header") == 11 and kinds.count("bp") == 21
+    first = next(left for kind, left, _ in me.rows() if kind == "bp")
+    assert "Fermenter" in first and "Rath'mael, Ruins of Lordaeron" in first
+    unknown = next(left for kind, left, _ in me.rows() if kind == "bp" and "Alchemy Laboratory" in left)
+    assert "drop not known yet" in unknown
+    me.run(
+        "GameTooltip.lines = {}; for _, fn in ipairs(MOCK.tooltipCalls[Enum.TooltipDataType.Item]) do fn(GameTooltip, { id = 273086 }) end"
+    )
+    lines = me.run("return table.concat(GameTooltip.lines, '\\n')")
+    assert "none of your characters learned it" in lines and "Gilnid (The Deadmines)" in lines
+
+
+def test_blueprints_in_spanish():
+    c = Client(locale="esES").login()
+    c.run("ns.UI.Toggle('blueprints')")
+    headers = [left for kind, left, _ in c.rows() if kind == "header"]
+    assert headers[0] == "Alquimia" and "Primeros auxilios" in headers

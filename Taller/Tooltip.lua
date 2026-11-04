@@ -11,6 +11,22 @@ local function onItem(tooltip, data)
 	if not itemID or issecretvalue(itemID) then
 		return
 	end
+	local bp = ns.Blueprints.BY_ITEM[itemID]
+	if bp then
+		local st = ns.Blueprints.State(bp)
+		if #st.learned > 0 then
+			local names = {}
+			for i, k in ipairs(st.learned) do
+				names[i] = ns.Short(k)
+			end
+			tooltip:AddLine(L.BP_TIP_LEARNED:format(table.concat(names, ", ")), 0.25, 0.75, 0.25)
+		else
+			tooltip:AddLine(L.BP_TIP_NONE, 1, 0.82, 0)
+		end
+		if bp.boss then
+			tooltip:AddLine(L.BP_TIP_SOURCE:format(bp.boss, bp.where), 0.7, 0.7, 0.7)
+		end
+	end
 	local need = 0
 	for _, s in ipairs(ns.Pins.Shopping()) do
 		if s.item == itemID then
