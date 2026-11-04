@@ -1,0 +1,21 @@
+## Interface: 16001
+## Title: Taller
+## Notes: Pin recipes with how many you want to make: it adds up the materials and counts what you have in your bags, bank and other characters, by profession.
+## Notes-esES: Pineá recetas con cuántas querés hacer: suma los materiales y cuenta lo que tenés en bolsas, banco y otros personajes, por profesión.
+## Notes-esMX: Pineá recetas con cuántas querés hacer: suma los materiales y cuenta lo que tenés en bolsas, banco y otros personajes, por profesión.
+## Author: José Argento
+## Version: @project-version@
+## SavedVariables: TallerDB
+## IconTexture: Interface\Icons\INV_Misc_Note_02
+## AddonCompartmentFunc: Taller_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: Taller_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: Taller_OnAddonCompartmentLeave
+## Category: Professions
+
+Locales.lua
+Core.lua
+Inventory.lua
+Pins.lua
+UI.lua
+Tooltip.lua
+Events.lua

@@ -1,0 +1,10 @@
+package-as: Taller
+
+move-folders:
+  Taller/Taller: Taller
+
+ignore:
+  - tests
+  - tools
+  - pyproject.toml
+  - README.en.md
