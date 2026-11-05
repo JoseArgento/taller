@@ -2,6 +2,7 @@ local _, ns = ...
 
 -- English is the fallback; Spanish for esES and esMX.
 local L = {
+	BINDING_TOGGLE = "Open / close",
 	TITLE = "Taller",
 	SHOPPING = "Shopping list",
 	BY_PROFESSION = "By profession",
@@ -57,6 +58,7 @@ local L = {
 }
 
 local es = {
+	BINDING_TOGGLE = "Abrir / cerrar",
 	TITLE = "Taller",
 	SHOPPING = "Lista de compras",
 	BY_PROFESSION = "Por profesión",

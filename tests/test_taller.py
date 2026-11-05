@@ -19,7 +19,7 @@ TESTS = Path(__file__).resolve().parent
 
 def toc_files():
     lines = (ADDON / "Taller.toc").read_text(encoding="utf-8").splitlines()
-    return [ln.strip().replace("\\", "/") for ln in lines if ln.strip() and not ln.startswith("#")]
+    return [ln.strip().replace("\\", "/") for ln in lines if ln.strip() and not ln.startswith("#") and ln.strip().endswith(".lua")]
 
 
 class Client:

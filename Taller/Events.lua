@@ -112,3 +112,10 @@ end
 function Taller_OnAddonCompartmentLeave()
 	GameTooltip:Hide()
 end
+
+-- Key binding (Bindings.xml) and its names in the key bindings panel.
+_G["Taller_Toggle"] = function()
+	ns.UI.Toggle()
+end
+_G["BINDING_HEADER_TALLER"] = "Taller"
+_G["BINDING_NAME_TALLER_TOGGLE"] = L.BINDING_TOGGLE

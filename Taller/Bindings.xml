@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="TALLER_TOGGLE" header="TALLER" category="ADDONS">
+		Taller_Toggle()
+	</Binding>
+</Bindings>

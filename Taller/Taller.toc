@@ -7,7 +7,7 @@
 ## Version: @project-version@
 ## SavedVariables: TallerDB
 ## OptionalDeps: Syndicator, Baganator, Auctionator
-## IconTexture: Interface\Icons\INV_Misc_Note_02
+## IconTexture: Interface\AddOns\Taller\Media\icon
 ## AddonCompartmentFunc: Taller_OnAddonCompartmentClick
 ## AddonCompartmentFuncOnEnter: Taller_OnAddonCompartmentEnter
 ## AddonCompartmentFuncOnLeave: Taller_OnAddonCompartmentLeave
@@ -22,3 +22,4 @@ Blueprints.lua
 UI.lua
 Tooltip.lua
 Events.lua
+Bindings.xml
