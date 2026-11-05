@@ -62,6 +62,7 @@ local handlers = {
 	end,
 }
 
+local onSlash -- the /taller handler, defined below; guarded once the saved variables are in
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
@@ -71,7 +72,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 			ns.InitDB()
 			frame:UnregisterEvent("ADDON_LOADED")
 			-- from here on a Lua error in a handler is kept, not thrown (see /taller errores)
-			SlashCmdList.TALLER = ns.guard.Install(frame, SlashCmdList.TALLER)
+			SlashCmdList.TALLER = ns.guard.Install(frame, onSlash)
 		end
 	elseif event == "PLAYER_LOGIN" then
 		ns.Char()
@@ -88,7 +89,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 end)
 
 SLASH_TALLER1 = "/taller"
-SlashCmdList.TALLER = function(msg)
+onSlash = function(msg)
 	msg = strtrim((msg or ""):lower())
 	if msg == "compras" or msg == "shopping" then
 		ns.UI.Toggle("shopping")
@@ -122,6 +123,7 @@ SlashCmdList.TALLER = function(msg)
 		ns.UI.Toggle()
 	end
 end
+SlashCmdList.TALLER = onSlash
 
 -- The round button on the minimap's edge (Pergamino): left click opens the book, right click the blueprints.
 -- Made once; the setting shows or hides it.
