@@ -99,8 +99,9 @@ function B.Rows()
 		end
 		group.count = group.count + 1
 		local st = B.State(e)
-		local status
+		local status, state
 		if #st.learned > 0 then
+			state = "learned"
 			group.learned = group.learned + 1
 			local names = {}
 			for i, k in ipairs(st.learned) do
@@ -108,9 +109,11 @@ function B.Rows()
 			end
 			status = "|cff40c040" .. L.BP_LEARNED:format(table.concat(names, ", ")) .. "|r"
 		elseif st.carried.total > 0 then
+			state = "carried"
 			local p = st.carried.places[1]
 			status = "|cffffd100" .. L.BP_CARRIED:format(p.who == "warband" and L.WARBAND or ns.Short(p.who)) .. "|r"
 		else
+			state = "missing"
 			status = "|cff9d9d9d" .. L.BP_MISSING .. "|r"
 			missing = missing + 1
 		end
@@ -119,7 +122,9 @@ function B.Rows()
 		rows[#rows + 1] = {
 			e = e,
 			left = L.BP_NAME:format(e.name, e.tier, e.skill),
+			short = L.BP_SHORT:format(e.name, e.tier),
 			status = status,
+			state = state,
 			source = source,
 		}
 	end

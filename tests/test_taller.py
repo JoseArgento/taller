@@ -283,7 +283,7 @@ def test_the_book_its_pages_and_bookmarks(me):
         "shopping",
     ]
     assert me.run("return ns.UI.frame.title:GetText()") == "Taller"
-    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping list"
+    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping"
     # the page that is open is the one of the mode
     assert me.run("return ns.UI.frame.selected") == "profession"
     assert me.run("return ns.UI.frame.pages.profession.left:IsShown()") and not me.run("return ns.UI.frame.pages.shopping.left:IsShown()")
@@ -327,6 +327,32 @@ def test_recipes_page_lists_pins_on_the_left_and_the_chosen_one_on_the_right(me)
     assert right is not None
 
 
+def test_the_quantity_field_always_shows_the_real_quantity(me):
+    # In the game the field once read "41" while the pin was at 4: the refresh skipped the focused field and
+    # what was typed stayed. Now + and - drop the focus and the refresh always writes the quantity back.
+    me.pin(2386, 1)
+    me.run("ns.UI.Toggle()")
+    qty = "ns.UI.views.profession.right.qty"
+    me.run(qty + ":SetFocus()")
+    for _ in range(3):
+        me.run("ns.UI.views.profession.right.plus:GetScript('OnClick')()")
+    assert me.ns.Pins.Find(2386)[0].qty == 4
+    assert me.run("return " + qty + ":GetText()") == "4"
+    assert not me.run("return " + qty + ":HasFocus()")
+    # typing applies on Enter...
+    me.run(qty + ":SetFocus(); " + qty + ":SetText('12')")
+    assert me.ns.Pins.Find(2386)[0].qty == 4
+    me.run(qty + ":GetScript('OnEnterPressed')(" + qty + ")")
+    assert me.ns.Pins.Find(2386)[0].qty == 12 and me.run("return " + qty + ":GetText()") == "12"
+    # ...or when the field loses focus; garbage leaves the quantity alone and the field shows it again
+    me.run(qty + ":SetFocus(); " + qty + ":SetText('')")
+    me.run(qty + ":ClearFocus()")
+    assert me.ns.Pins.Find(2386)[0].qty == 12 and me.run("return " + qty + ":GetText()") == "12"
+    assert "12 crafts" in me.run("return ns.UI.views.profession.right.sub:GetText()")
+    me.run("ns.Pins.SetQty(ns.UI.pin, 1)")
+    assert "1 craft " in me.run("return ns.UI.views.profession.right.sub:GetText()") + " "
+
+
 def test_shopping_page_is_a_ledger_with_the_text_to_copy(me):
     me.pin(2963, 2)
     me.run("ns.UI.Toggle('shopping')")
@@ -356,9 +382,9 @@ def test_language_can_be_chosen_whatever_the_client_speaks(me):
     me.pin(2963, 2)
     assert "faltan 4" in next(right for kind, _, right in me.rows() if kind == "reagent")
     me.run("ns.UI.Toggle()")
-    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Lista de compras"
+    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Compras"
     me.lua.globals().SlashCmdList.TALLER("idioma en")
-    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping list"
+    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping"
     me.lua.globals().SlashCmdList.TALLER("idioma klingon")
     assert "es, en or auto" in me.chat()[-1]
     # the setting survives a login, and "auto" follows the client
@@ -435,10 +461,14 @@ def test_blueprint_tab_and_tooltip(me):
     assert me.ns.UI.mode == "blueprints"
     kinds = [k for k, _, _ in me.rows()]
     assert kinds[0] == "note" and kinds.count("header") == 11 and kinds.count("bp") == 21
+    # the left page is short (name and tier, state as a tag); skill and the drop live on the right page
     first = next(left for kind, left, _ in me.rows() if kind == "bp")
-    assert "Fermenter" in first and "Rath'mael, Ruins of Lordaeron" in first
-    unknown = next(left for kind, left, _ in me.rows() if kind == "bp" and "Alchemy Laboratory" in left)
-    assert "drop not known yet" in unknown
+    assert first.strip() == "Fermenter · tier 2"
+    rows = me.lua_rows("ns.UI.Rows()")
+    firstbp = next(r for r in rows if r.kind == "bp")
+    assert firstbp.bp.state == "missing" and "Rath'mael, Ruins of Lordaeron" in firstbp.bp.source
+    unknown = next(r for r in rows if r.kind == "bp" and r.bp.e.name == "Alchemy Laboratory")
+    assert "drop not known yet" in unknown.bp.source
     me.run(
         "GameTooltip.lines = {}; for _, fn in ipairs(MOCK.tooltipCalls[Enum.TooltipDataType.Item]) do fn(GameTooltip, { id = 273086 }) end"
     )

@@ -1,5 +1,8 @@
 local ADDON, ns = ...
 local L = ns.L
+
+-- how a blueprint's state is coloured on the left page
+local TAG_KIND = { learned = "zone", carried = "pinned", missing = "muted" }
 local P = Pergamino
 
 -- The window is an open book (Pergamino): three bookmarks. Recetas: the pinned recipes by profession on
@@ -81,7 +84,8 @@ function UI.Describe(row)
 	elseif row.kind == "note" then
 		return { left = row.text }
 	elseif row.kind == "bp" then
-		return { left = "    " .. row.bp.left .. "  " .. GREY .. row.bp.source .. "|r", right = row.bp.status }
+		-- short on the left page (name and tier); skill, who and the drop live on the right page
+		return { left = "    " .. row.bp.short, tag = row.bp.state }
 	elseif row.kind == "pin" then
 		local p = row.pin
 		local who = p.crafter ~= ns.CharKey() and ("  " .. GREY .. L.CRAFTER:format(ns.Short(p.crafter)) .. "|r") or ""
@@ -245,7 +249,18 @@ local function initRow(row, item)
 	row.left:SetText(d.left)
 	row.right:SetText(d.right or "")
 	row.right:SetShown((d.right or "") ~= "")
-	row.left:SetPoint("RIGHT", (d.right or "") ~= "" and -110 or -8, 0)
+	if d.tag then
+		-- a blueprint's state as a small seal on the right (learned / carried / missing)
+		if not row.tag then
+			row.tag = P.Tag(row, "", "note")
+			row.tag:SetPoint("RIGHT", -8, 0)
+		end
+		row.tag:Set(L["BP_STATE_" .. d.tag:upper()], TAG_KIND[d.tag])
+		row.tag:Show()
+	elseif row.tag then
+		row.tag:Hide()
+	end
+	row.left:SetPoint("RIGHT", ((d.right or "") ~= "" or d.tag) and -110 or -8, 0)
 	local chosen = (item.kind == "pin" and item.pin == UI.pin) or (item.kind == "bp" and item.bp.e == UI.blueprint)
 	row.selected:SetShown(chosen)
 end
@@ -275,26 +290,38 @@ local function buildRecipePage(page)
 	r.sub:SetPoint("RIGHT")
 	r.qtyLabel = P.Label(page, L.QTY, "body")
 	r.qtyLabel:SetPoint("TOPLEFT", r.sub, "BOTTOMLEFT", 0, -12)
-	r.qty = P.Edit(page, 60, {
-		onEnter = function(self)
-			if UI.pin then
-				ns.Pins.SetQty(UI.pin, tonumber(self:GetText()) or UI.pin.qty)
+	-- What is typed applies on Enter or when the field loses focus, never while typing; the buttons drop the
+	-- focus first, and the refresh always writes the real quantity back (the game once showed "41" for 4).
+	local function applyTyped(self)
+		if UI.pin then
+			ns.Pins.SetQty(UI.pin, tonumber(self:GetText()) or UI.pin.qty)
+			if r.qty then
+				r.qty:SetText(tostring(UI.pin.qty))
 			end
-		end,
-	})
+		end
+	end
+	r.qty = P.Edit(page, 60, { onEnter = applyTyped })
 	r.qty:SetPoint("LEFT", r.qtyLabel, "RIGHT", 8, 0)
 	r.qty:SetNumeric(true)
-	r.minus = P.Button(page, "-", 28, function()
-		if UI.pin then
-			ns.Pins.SetQty(UI.pin, UI.pin.qty - (IsShiftKeyDown() and 10 or (UI.pin.per or 1)))
+	r.qty:HookScript("OnEditFocusLost", applyTyped)
+	local function step(sign)
+		return function()
+			r.qty:ClearFocus()
+			if UI.pin then
+				ns.Pins.SetQty(UI.pin, UI.pin.qty + sign * (IsShiftKeyDown() and 10 or (UI.pin.per or 1)))
+			end
 		end
-	end)
+	end
+	r.minus = P.Button(page, "-", 36, step(-1))
 	r.minus:SetPoint("LEFT", r.qty, "RIGHT", 8, 0)
-	r.plus = P.Button(page, "+", 28, function()
-		if UI.pin then
-			ns.Pins.SetQty(UI.pin, UI.pin.qty + (IsShiftKeyDown() and 10 or (UI.pin.per or 1)))
-		end
-	end)
+	r.minus:SetHeight(36)
+	r.minus:SetNormalFontObject(P.fonts.title)
+	r.minus:SetHighlightFontObject(P.fonts.title)
+	r.plus = P.Button(page, "+", 36, step(1))
+	r.plus:SetPoint("LEFT", r.minus, "RIGHT", 4, 0)
+	r.plus:SetHeight(36)
+	r.plus:SetNormalFontObject(P.fonts.title)
+	r.plus:SetHighlightFontObject(P.fonts.title)
 	r.plus:SetPoint("LEFT", r.minus, "RIGHT", 4, 0)
 	r.remove = P.Button(page, L.REMOVE, 100, function()
 		if UI.pin then
@@ -345,7 +372,8 @@ local function buildRecipePage(page)
 			return
 		end
 		r.title:SetText(pin.name)
-		local bits = { L.CRAFTS:format(ns.Pins.Crafts(pin)) }
+		local crafts = ns.Pins.Crafts(pin)
+		local bits = { (crafts == 1 and L.CRAFT_ONE or L.CRAFTS):format(crafts) }
 		if (pin.per or 1) > 1 then
 			bits[#bits + 1] = L.PER_CRAFT:format(pin.per)
 		end
@@ -355,9 +383,7 @@ local function buildRecipePage(page)
 		local short = pinShort(pin)
 		bits[#bits + 1] = short == 0 and L.ALL_READY or L.SHORT:format(short)
 		r.sub:SetText(table.concat(bits, " · "))
-		if not r.qty:HasFocus() then
-			r.qty:SetText(tostring(pin.qty))
-		end
+		r.qty:SetText(tostring(pin.qty))
 		local items = {}
 		for _, n in ipairs(ns.Pins.Needs(pin)) do
 			items[#items + 1] = { kind = "reagent", item = n.item, need = n.need, have = n.have }
@@ -476,7 +502,7 @@ end
 -- the book -----------------------------------------------------------------------------------------------
 
 local TIP_OF = { profession = "TIP_RECIPES", shopping = "TIP_SHOPPING", blueprints = "TIP_BLUEPRINTS" }
-local TAB_OF = { profession = "BY_PROFESSION", shopping = "SHOPPING", blueprints = "BLUEPRINTS" }
+local TAB_OF = { profession = "TAB_PROFESSION", shopping = "TAB_SHOPPING", blueprints = "TAB_BLUEPRINTS" }
 local HEAD_OF = { profession = "BY_PROFESSION", shopping = "SHOPPING", blueprints = "BLUEPRINTS" }
 
 local function build()
