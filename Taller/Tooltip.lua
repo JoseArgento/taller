@@ -43,7 +43,7 @@ local function onItem(tooltip, data)
 		local who
 		for _, p in ipairs(have.places) do
 			if p.who ~= ns.CharKey() then
-				who = p.who == "warband" and L.WARBAND or ns.Short(p.who)
+				who = ns.PlaceName(p.who)
 				break
 			end
 		end

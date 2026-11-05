@@ -14,11 +14,15 @@ local GREEN, RED, GREY = "|cff40c040", "|cffff5050", "|cff9d9d9d"
 local function whereText(have)
 	local parts = {}
 	for _, p in ipairs(have.places) do
-		local who = p.who == "warband" and L.WARBAND or ns.Short(p.who)
-		local where = p.where == "warband" and "" or (" (" .. L[p.where:upper()] .. ")")
+		local who = ns.PlaceName(p.who)
+		local where = (p.where == "warband" or p.where == "guildbank") and "" or (" (" .. L[p.where:upper()] .. ")")
 		parts[#parts + 1] = p.n .. " " .. who .. where
 	end
-	return table.concat(parts, ", ")
+	local text = table.concat(parts, ", ")
+	if have.via then
+		text = text .. "  " .. GREY .. L.VIA:format(have.via) .. "|r"
+	end
+	return text
 end
 
 -- Rows for the list, from the pins.
@@ -37,8 +41,13 @@ function UI.Rows()
 		return rows
 	end
 	if UI.mode == "shopping" then
-		for _, s in ipairs(ns.Pins.Shopping()) do
-			rows[#rows + 1] = { kind = "reagent", item = s.item, need = s.need, have = s.have }
+		local list = ns.Pins.Shopping()
+		for _, s in ipairs(list) do
+			rows[#rows + 1] = { kind = "reagent", item = s.item, need = s.need, have = s.have, price = s.price, cost = s.cost }
+		end
+		local total = ns.Pins.ShoppingTotal(list)
+		if total then
+			rows[#rows + 1] = { kind = "note", text = L.TOTAL:format(ns.Partners.Money(total)) }
 		end
 		return rows
 	end
@@ -72,6 +81,9 @@ function UI.Describe(row)
 	local right = (missing == 0 and GREEN or RED) .. L.HAVE:format(math.min(have, row.need), row.need) .. "|r"
 	if missing > 0 then
 		right = right .. "  " .. L.MISSING:format(missing)
+		if row.cost then
+			right = right .. "  " .. GREY .. L.PRICE:format(ns.Partners.Money(row.cost)) .. "|r"
+		end
 	end
 	local left = (row.indent and "    " or "") .. ns.ItemName(row.item)
 	if made then
@@ -155,12 +167,25 @@ end
 -- The shopping list as text, to paste in a whisper or for a guildmate who gathers: "20x Linen Cloth (10 missing)".
 function UI.ShoppingText()
 	local lines = {}
-	for _, item in ipairs(ns.Pins.Shopping()) do
+	local list = ns.Pins.Shopping()
+	for _, item in ipairs(list) do
 		if item.missing > 0 then
-			lines[#lines + 1] = L.COPY_LINE:format(item.missing, ns.ItemName(item.item))
+			local line = L.COPY_LINE:format(item.missing, ns.ItemName(item.item))
+			if item.cost then
+				line = line .. " " .. L.PRICE:format(ns.Partners.Money(item.cost))
+			end
+			lines[#lines + 1] = line
 		end
 	end
-	return #lines > 0 and table.concat(lines, ", ") or L.COPY_NOTHING
+	if #lines == 0 then
+		return L.COPY_NOTHING
+	end
+	local text = table.concat(lines, ", ")
+	local total = ns.Pins.ShoppingTotal(list)
+	if total then
+		text = text .. ". " .. L.TOTAL:format(ns.Partners.Money(total))
+	end
+	return text
 end
 
 StaticPopupDialogs.TALLER_COPY = {

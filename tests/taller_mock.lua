@@ -144,3 +144,45 @@ function MOCK.put(bag, itemID, count)
 	MOCK.bags[bag] = MOCK.bags[bag] or {}
 	table.insert(MOCK.bags[bag], { itemID, count })
 end
+
+-- Other addons, present only when a test says so: MOCK.loaded.Syndicator / Baganator / Auctionator.
+-- The shapes follow the API names Partners.lua expects (⏳ from memory, see that file).
+MOCK.loaded = MOCK.loaded or {}
+MOCK.syndicator = { items = {}, callbacks = {}, throws = false } -- items[itemID] = the API's answer
+MOCK.auctionator = { prices = {}, callbacks = {}, throws = false } -- prices[itemID] = copper
+
+Syndicator = {
+	API = {
+		GetInventoryInfoByItemID = function(itemID, sameConnectedRealm, sameFaction)
+			assert(sameConnectedRealm == false and sameFaction == false, "GetInventoryInfoByItemID(itemID, false, false)")
+			if MOCK.syndicator.throws then
+				error("Syndicator exploded")
+			end
+			return MOCK.syndicator.items[itemID] or { characters = {}, guilds = {}, warband = {} }
+		end,
+	},
+	CallbackRegistry = {
+		RegisterCallback = function(self, event, fn)
+			assert(self == Syndicator.CallbackRegistry, "RegisterCallback is a method")
+			MOCK.syndicator.callbacks[event] = fn
+		end,
+	},
+}
+
+Auctionator = {
+	API = {
+		v1 = {
+			GetAuctionPriceByItemID = function(callerID, itemID)
+				assert(callerID == "Taller", "callerID")
+				if MOCK.auctionator.throws then
+					error("Auctionator exploded")
+				end
+				return MOCK.auctionator.prices[itemID]
+			end,
+			RegisterForDBUpdate = function(callerID, fn)
+				assert(callerID == "Taller", "callerID")
+				MOCK.auctionator.callbacks[#MOCK.auctionator.callbacks + 1] = fn
+			end,
+		},
+	},
+}

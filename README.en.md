@@ -15,9 +15,11 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 
 **What it counts:** bags (and the reagent bag) always; your bank and the account bank as you last saw them; other characters as of your last login with them. Not the mailbox or the auction house.
 
+**Plays well with Syndicator, Baganator and Auctionator** (none required): with **Syndicator** (also bundled in **Baganator**) your other characters, the guild bank and the account bank are counted from its data, which covers characters Taller never saw, mail included; your own bags and bank stay live from Taller. The material's tooltip says "via Syndicator" when that is where a count came from. With **Auctionator**, the shopping list prices each missing material (`~1g 85s 10c`) and shows the total; "Copy list" includes them. When either is missing or its API differs, nothing is shown and Taller works as before. ⏳ Their API names are from memory (their sources could not be fetched when this was written): see `Taller/Partners.lua`; every call is guarded, and it is untested with both installed.
+
 **Why another one:** *Forever Profession Master* has a queue with quantities but only counts bags; *ItemWatch & Shopping List* counts bags and bank but not alts; *ForeverArtisan* counts alts with an extra bag addon. Taller does one thing: what you want to craft against everything you own, on every character, with nothing else needed.
 
-**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 31 tests in Lua 5.1 with several characters sharing the saved data. **Not tested in the game**: how the window looks, that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, and that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting.
+**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 38 tests in Lua 5.1 with several characters sharing the saved data and stand-ins for Syndicator and Auctionator. **Not tested in the game**: how the window looks, that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting, and the real Syndicator and Auctionator APIs.
 
 ## Support
 

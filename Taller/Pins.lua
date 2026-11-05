@@ -131,7 +131,10 @@ function P.Shopping()
 	local out = {}
 	for item, n in pairs(need) do
 		local have = ns.Inventory.Count(item)
-		out[#out + 1] = { item = item, need = n, have = have, missing = math.max(0, n - have.total) }
+		local missing = math.max(0, n - have.total)
+		-- Auctionator's price of one, and what the missing ones would cost; nil without Auctionator
+		local price = missing > 0 and ns.Partners and ns.Partners.Price(item) or nil
+		out[#out + 1] = { item = item, need = n, have = have, missing = missing, price = price, cost = price and price * missing or nil }
 	end
 	table.sort(out, function(a, b)
 		if a.missing ~= b.missing then
@@ -140,6 +143,19 @@ function P.Shopping()
 		return a.item < b.item
 	end)
 	return out
+end
+
+-- What the missing materials would cost at the auction house, per Auctionator: copper, or nil when
+-- there is no Auctionator or it has no price for any of them.
+function P.ShoppingTotal(list)
+	local total, any = 0, false
+	for _, s in ipairs(list or P.Shopping()) do
+		if s.cost then
+			total = total + s.cost
+			any = true
+		end
+	end
+	return any and total or nil
 end
 
 -- Pins grouped by profession: { { profession, pins = { ... } } }, professions in alphabetical order.

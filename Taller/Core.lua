@@ -58,6 +58,14 @@ function ns.Short(key)
 	return key
 end
 
+-- The name of a place from Inventory.Count: a character, "account bank", or a guild bank.
+function ns.PlaceName(who)
+	if who == "warband" then
+		return L.WARBAND
+	end
+	return who:match("^guild:(.+)$") or ns.Short(who)
+end
+
 function ns.ItemName(itemID)
 	local name = C_Item.GetItemNameByID(itemID)
 	if not name or issecretvalue(name) then

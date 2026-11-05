@@ -71,22 +71,39 @@ function Inv.ScanBank()
 end
 
 -- How many of an item you have, and where: { total, here = bags + bank of this character,
--- places = { { who = "Ana-Forever" | "warband", where = "bags" | "bank", n } } }.
+-- places = { { who = "Ana-Forever" | "guild:Name" | "warband", where = "bags" | "bank" | "mail" |
+-- "guildbank" | "warband", n, via = "Syndicator"? } }, via = "Syndicator" when any place came from it }.
+-- With Syndicator installed, the other characters, the guild bank and the account bank come from it
+-- (it knows characters Taller never saw); this character's own bags and bank stay Taller's, read live.
 function Inv.Count(itemID)
 	local me = ns.CharKey()
 	local out = { total = 0, here = 0, places = {} }
-	local function add(who, where, n)
+	local function add(who, where, n, via)
 		if n and n > 0 then
 			out.total = out.total + n
 			if who == me then
 				out.here = out.here + n
 			end
-			out.places[#out.places + 1] = { who = who, where = where, n = n }
+			out.places[#out.places + 1] = { who = who, where = where, n = n, via = via }
+			if via then
+				out.via = via
+			end
+		end
+	end
+	local theirs = ns.Partners and ns.Partners.SyndicatorPlaces(itemID)
+	local known = {} -- characters Syndicator answered for: Taller's older scan of them is not added again
+	if theirs then
+		for _, p in ipairs(theirs) do
+			if p.who ~= me then
+				known[p.who] = true
+			end
 		end
 	end
 	local keys = {}
 	for key in pairs(ns.db.chars) do
-		keys[#keys + 1] = key
+		if key == me or not known[key] then
+			keys[#keys + 1] = key
+		end
 	end
 	table.sort(keys, function(a, b)
 		if (a == me) ~= (b == me) then
@@ -99,6 +116,19 @@ function Inv.Count(itemID)
 		add(key, "bags", c.bags and c.bags[itemID])
 		add(key, "bank", c.bank and c.bank[itemID])
 	end
-	add("warband", "warband", ns.db.warband.items[itemID])
+	if theirs then
+		local sawWarband = false
+		for _, p in ipairs(theirs) do
+			if p.who ~= me then
+				add(p.who, p.where, p.n, p.via)
+				sawWarband = sawWarband or p.who == "warband"
+			end
+		end
+		if not sawWarband then
+			add("warband", "warband", ns.db.warband.items[itemID])
+		end
+	else
+		add("warband", "warband", ns.db.warband.items[itemID])
+	end
 	return out
 end

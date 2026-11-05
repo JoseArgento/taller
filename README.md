@@ -33,7 +33,16 @@ Las recetas son de quien las sabe hacer: si pineás algo con tu alt herrero, lo 
 - **Banco:** lo que viste la última vez que lo abriste. Si nunca lo abriste con ese personaje, te lo dice.
 - **Banco de cuenta:** igual, una sola vez para todos.
 - **Otros personajes:** lo que tenían la última vez que entraste con ellos.
-- **No cuenta** el correo ni lo que está en la subasta.
+- **No cuenta** el correo ni lo que está en la subasta (salvo con Syndicator, ver abajo).
+
+## Se lleva bien con Syndicator, Baganator y Auctionator
+
+No necesita ninguno, pero si los tenés los aprovecha:
+
+- **Syndicator** (viene también adentro de **Baganator**): cuenta lo que tienen tus otros personajes, el banco de la guild y el banco de cuenta según Syndicator, que ya sigue a todos tus personajes aunque Taller nunca los haya visto, y suma el correo. Tus propias bolsas y tu banco los sigue leyendo Taller en vivo. Cuando un dato viene de ahí, el tooltip del material lo dice ("vía Syndicator").
+- **Auctionator**: en la lista de compras, cada material que falta muestra lo que costaría según los precios de Auctionator (`~1g 85s 10c`) y abajo el total. "Copiar lista" los incluye.
+
+Si alguno de los dos no está, o cambió su API, Taller no muestra nada de eso y sigue como siempre. ⏳ Los nombres de sus funciones están tomados de memoria (no pude bajar el código de ninguno de los dos al escribir esto): están en `Taller/Partners.lua`, cada llamada va protegida, y falta probarlo con los dos instalados.
 
 ## Instalar
 
@@ -48,7 +57,7 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 **Probado:**
 - ✅ Cada función, evento, template y sonido existe en Forever 1.60.1: `tools/check_api.py` contra los dumps de [Ketho/BlizzardInterfaceResources](https://github.com/Ketho/BlizzardInterfaceResources) y la UI de [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), rama `forever`. Forever usa la API de profesiones moderna (`C_TradeSkillUI.GetRecipeSchematic`, `TRACKED_RECIPE_UPDATE`) y el banco por pestañas (`Enum.BagIndex.CharacterBankTab_*`, `AccountBankTab_*`).
 - ✅ [forever-lint](https://github.com/JoseArgento/forever-lint) sin problemas; [Addon Sentry](https://github.com/JoseArgento/addon-sentry): "Sin señales de riesgo".
-- ✅ **31 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados.
+- ✅ **38 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
 
 **Sin probar ⏳** (no tengo el cliente de Forever):
 - Cómo se ve la ventana.
@@ -56,6 +65,7 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 - Que el banco de Forever use las pestañas de banco modernas y que el de cuenta exista.
 - Que `UNIT_SPELLCAST_SUCCEEDED` traiga el ID de la receta al craftear (así es en retail).
 - Los planos: que la receta que enseña cada plano dé como resultado el objeto de campamento (así los reconoce), y qué jefe tira los 10 que faltan.
+- Syndicator y Auctionator de verdad: los nombres de sus APIs y la forma de lo que devuelven.
 
 ## Desarrollo
 

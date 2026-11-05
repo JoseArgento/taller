@@ -373,3 +373,133 @@ def test_copy_the_shopping_list(me):
     me.put(0, 2589, 15)
     me.bags_changed()
     assert me.ns.UI.ShoppingText() == "Nothing missing."
+
+
+# other addons: Syndicator / Baganator counts and Auctionator prices ------------------------------------
+
+SYND_LINEN = """
+MOCK.syndicator.items[2589] = {
+  characters = {
+    { character = "Josecito", realm = "Forever", bags = 99, bank = 99 },  -- ignored: this character is read live
+    { character = "Ana", realm = "Forever", bags = 4, equipped = 0, bank = 6, mail = 2 },
+    { character = "Beto", realm = "Forever", bags = 0, bank = 0 },
+  },
+  guilds = { { guild = "Los Pibes", realm = "Forever", bank = 30 } },
+  warband = { { bank = 5 }, { bank = 7 } },
+}
+"""
+
+
+def syndicator_client(addon="Syndicator"):
+    c = Client()
+    c.run(f"MOCK.loaded['{addon}'] = true")
+    c.run(SYND_LINEN)
+    return c.login()
+
+
+def test_without_other_addons_nothing_changes(me):
+    me.run(SYND_LINEN)  # the globals exist but the addons are not loaded
+    me.run("MOCK.auctionator.prices[2589] = 500")
+    me.pin(2963, 10)
+    me.put(0, 2589, 5)
+    me.bags_changed()
+    assert me.shopping() == {2589: (20, 5, 15)}
+    assert not me.ns.Partners.HasSyndicator() and not me.ns.Partners.HasPrices()
+    assert me.ns.UI.ShoppingText() == "15x Linen Cloth"
+    assert all("Auctionator" not in left for _, left, _ in me.rows())
+
+
+def test_syndicator_counts_alts_guild_bank_and_warband():
+    c = syndicator_client()
+    c.pin(2963, 30)  # 60 linen
+    c.put(0, 2589, 5)
+    c.bags_changed()
+    have = c.ns.Inventory.Count(2589)
+    places = [(have.places[i].who, have.places[i].where, have.places[i].n) for i in range(1, len(have.places) + 1)]
+    # mine live (5), then Ana's bags, bank and mail, the guild bank and both account-bank tabs added up
+    assert places == [
+        ("Josecito-Forever", "bags", 5),
+        ("Ana-Forever", "bags", 4),
+        ("Ana-Forever", "bank", 6),
+        ("Ana-Forever", "mail", 2),
+        ("guild:Los Pibes", "guildbank", 30),
+        ("warband", "warband", 12),
+    ]
+    assert have.total == 59 and have.here == 5 and have.via == "Syndicator"
+    assert c.shopping() == {2589: (60, 59, 1)}
+
+
+def test_syndicator_wins_over_an_old_scan_of_the_same_alt():
+    saved = 'TallerDB = { chars = { ["Ana-Forever"] = { bags = { [2589] = 40 }, bank = {} } }, warband = { items = { [2589] = 100 } } }'
+    c = Client(saved=saved)
+    c.run("MOCK.loaded.Baganator = true")  # Baganator bundles Syndicator
+    c.run(SYND_LINEN)
+    c.login()
+    have = c.ns.Inventory.Count(2589)
+    who = {(have.places[i].who, have.places[i].where): have.places[i].n for i in range(1, len(have.places) + 1)}
+    assert who[("Ana-Forever", "bags")] == 4 and who[("warband", "warband")] == 12  # not 40 and 100
+    assert have.total == 54
+
+
+def test_syndicator_label_in_the_tooltip_and_a_throwing_api():
+    c = syndicator_client()
+    c.pin(2963, 10)
+    c.run("ns.UI.Toggle('shopping')")
+    rows = c.rows()
+    assert rows and rows[0][0] == "reagent"
+    assert c.ns.PlaceName("guild:Los Pibes") == "Los Pibes" and c.ns.PlaceName("warband") == "account bank"
+    c.run("MOCK.syndicator.throws = true")
+    have = c.ns.Inventory.Count(2589)
+    assert have.total == 0 and have.via is None  # the error is swallowed; Taller's own data stays
+    c.run("MOCK.syndicator.throws = false; MOCK.syndicator.items[2589] = { characters = 'garbage' }")
+    assert c.ns.Inventory.Count(2589).total == 0  # an unexpected shape is ignored
+
+
+def test_syndicator_updates_redraw():
+    c = syndicator_client()
+    assert sorted(
+        c.run(
+            "local out = {} for k in pairs(MOCK.syndicator.callbacks) do out[#out + 1] = k end table.sort(out) return table.concat(out, ',')"
+        ).split(",")
+    ) == [
+        "BagCacheUpdate",
+        "BankCacheUpdate",
+        "GuildCacheUpdate",
+        "WarbandBankCacheUpdate",
+    ]
+    c.run("ns.hits = 0; ns.On('inventory', function() ns.hits = ns.hits + 1 end)")
+    c.run("MOCK.syndicator.callbacks.BagCacheUpdate()")
+    assert c.run("return ns.hits") == 1
+
+
+def test_auctionator_prices_the_missing_materials():
+    c = Client()
+    c.run("MOCK.loaded.Auctionator = true; MOCK.auctionator.prices[2589] = 1234; MOCK.auctionator.prices[2320] = 10")
+    c.login()
+    c.pin(2963, 10)  # 20 linen
+    c.pin(2386, 2)  # 2 bolts + 2 thread
+    c.put(0, 2589, 5)
+    c.bags_changed()
+    s = c.ns.Pins.Shopping()
+    by = {s[i].item: (s[i].missing, s[i].price, s[i].cost) for i in range(1, len(s) + 1)}
+    assert by[2589] == (15, 1234, 15 * 1234) and by[2320] == (2, 10, 20) and by[2996][1] is None  # bolts: no price
+    assert c.ns.Pins.ShoppingTotal() == 15 * 1234 + 20
+    assert c.ns.Partners.Money(15 * 1234 + 20) == "1g 85s 30c" and c.ns.Partners.Money(7) == "7c"
+    text = c.ns.UI.ShoppingText()
+    assert "15x Linen Cloth ~1g 85s 10c" in text and "2x Coarse Thread ~20c" in text and text.endswith("about 1g 85s 30c, per Auctionator.")
+    c.run("ns.UI.Toggle('shopping')")
+    rows = c.rows()
+    assert rows[-1][0] == "note" and "1g 85s 30c" in rows[-1][1]
+    assert any("~1g 85s 10c" in (right or "") for _, _, right in rows)
+    c.run("ns.hits = 0; ns.On('inventory', function() ns.hits = ns.hits + 1 end); MOCK.auctionator.callbacks[1]()")
+    assert c.run("return ns.hits") == 1
+    c.run("MOCK.auctionator.throws = true")
+    assert c.ns.Pins.ShoppingTotal() is None and "~" not in c.ns.UI.ShoppingText()
+
+
+def test_prices_in_spanish():
+    c = Client(locale="esES")
+    c.run("MOCK.loaded.Auctionator = true; MOCK.auctionator.prices[2589] = 100")
+    c.login()
+    c.pin(2963, 1)
+    assert c.ns.UI.ShoppingText() == "2x Linen Cloth ~2s 0c. Lo que falta sale unos 2s 0c, según Auctionator."

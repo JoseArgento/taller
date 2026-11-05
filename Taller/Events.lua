@@ -73,6 +73,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 		end
 	elseif event == "PLAYER_LOGIN" then
 		ns.Char()
+		ns.Partners.Init()
 		Inv.ScanBags()
 		ns.Pins.SyncTracked()
 		for e in pairs(handlers) do
