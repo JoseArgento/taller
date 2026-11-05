@@ -312,17 +312,13 @@ local function buildRecipePage(page)
 			end
 		end
 	end
-	r.minus = P.Button(page, "-", 36, step(-1))
-	r.minus:SetPoint("LEFT", r.qty, "RIGHT", 8, 0)
-	r.minus:SetHeight(36)
-	r.minus:SetNormalFontObject(P.fonts.title)
-	r.minus:SetHighlightFontObject(P.fonts.title)
-	r.plus = P.Button(page, "+", 36, step(1))
+	-- small square buttons, the same height as the quantity line (the gold button font)
+	r.minus = P.Button(page, "-", 24, step(-1))
+	r.minus:SetPoint("LEFT", r.qty, "RIGHT", 10, 0)
+	r.minus:SetHeight(22)
+	r.plus = P.Button(page, "+", 24, step(1))
 	r.plus:SetPoint("LEFT", r.minus, "RIGHT", 4, 0)
-	r.plus:SetHeight(36)
-	r.plus:SetNormalFontObject(P.fonts.title)
-	r.plus:SetHighlightFontObject(P.fonts.title)
-	r.plus:SetPoint("LEFT", r.minus, "RIGHT", 4, 0)
+	r.plus:SetHeight(22)
 	r.remove = P.Button(page, L.REMOVE, 100, function()
 		if UI.pin then
 			ns.Pins.Unpin(UI.pin)
