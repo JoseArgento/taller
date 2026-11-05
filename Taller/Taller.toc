@@ -23,4 +23,3 @@ Blueprints.lua
 UI.lua
 Tooltip.lua
 Events.lua
-Bindings.xml
