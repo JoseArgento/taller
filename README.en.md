@@ -4,6 +4,8 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 
 [Leer en castellano](README.md)
 
+![Taller in the game: a pinned recipe with its materials](docs/libro.png)
+
 It opens with `/taller`, with the **round minimap button** (right click: the blueprints; drag it around the minimap, `/taller minimapa off` hides it), with the key binding or from the addon compartment. The window is an **open book** (the [Pergamino](https://github.com/JoseArgento/pergamino) skin shared with Bitácora and the other addons): three cloth bookmarks, **Recipes**, **Shopping** and **Blueprints**; on each, the left page is the list and the right page the detail of what you picked.
 
 - **Pin:** in the game's profession window, tick the box to track the recipe. It shows up in Taller. Untick it and it's unpinned; unpin it in Taller and it's unticked.
@@ -21,7 +23,7 @@ It opens with `/taller`, with the **round minimap button** (right click: the blu
 
 **Why another one:** *Forever Profession Master* has a queue with quantities but only counts bags; *ItemWatch & Shopping List* counts bags and bank but not alts; *ForeverArtisan* counts alts with an extra bag addon. Taller does one thing: what you want to craft against everything you own, on every character, with nothing else needed.
 
-**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 42 tests in Lua 5.1 with several characters sharing the saved data and stand-ins for Syndicator and Auctionator. **Not tested in the game**: how the book looks (textures and the OFL fonts ship inside `Taller/Libs/Pergamino`), that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting, and the real Syndicator and Auctionator APIs.
+**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 48 tests in Lua 5.1 with several characters sharing the saved data and stand-ins for Syndicator and Auctionator. **In the client** (since launch): the book, pinning from the profession window, material counts across bags and bank, the shopping list, the folded blueprints and the minimap button. **Not seen yet**: that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting (so the count goes down by itself), Forever's account bank, which boss drops the 10 missing blueprints, and the real Syndicator and Auctionator APIs.
 
 ## Support
 

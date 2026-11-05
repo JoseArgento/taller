@@ -4,6 +4,8 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 
 [Read in English](README.en.md)
 
+![Taller en el juego: una receta pineada con sus materiales](docs/libro.png)
+
 **Contenido**
 
 - [Cómo se usa](#cómo-se-usa)
@@ -59,13 +61,13 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 **Probado:**
 - ✅ Cada función, evento, template y sonido existe en Forever 1.60.1: `tools/check_api.py` contra los dumps de [Ketho/BlizzardInterfaceResources](https://github.com/Ketho/BlizzardInterfaceResources) y la UI de [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), rama `forever`. Forever usa la API de profesiones moderna (`C_TradeSkillUI.GetRecipeSchematic`, `TRACKED_RECIPE_UPDATE`) y el banco por pestañas (`Enum.BagIndex.CharacterBankTab_*`, `AccountBankTab_*`).
 - ✅ [forever-lint](https://github.com/JoseArgento/forever-lint) sin problemas; [Addon Sentry](https://github.com/JoseArgento/addon-sentry): "Sin señales de riesgo".
-- ✅ **42 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
+- ✅ **48 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
 
-**Sin probar ⏳** (no tengo el cliente de Forever):
-- Cómo se ve el libro: las texturas y las fuentes (Alegreya y Cinzel, licencia OFL) van dentro del addon, en `Taller/Libs/Pergamino`.
-- Que la casilla para seguir recetas de Forever dispare `TRACKED_RECIPE_UPDATE` como en retail.
-- Que el banco de Forever use las pestañas de banco modernas y que el de cuenta exista.
-- Que `UNIT_SPELLCAST_SUCCEEDED` traiga el ID de la receta al craftear (así es en retail).
+**En el cliente** (desde el lanzamiento): el libro, pinear una receta desde la ventana de profesiones, la cuenta de materiales en bolsas y banco, la lista de compras, los planos plegados y el botón del minimapa.
+
+**Todavía sin ver ⏳:**
+- Que `UNIT_SPELLCAST_SUCCEEDED` traiga el ID de la receta al craftear, para que la cantidad baje sola (así es en retail).
+- El banco de cuenta de Forever.
 - Los planos: que la receta que enseña cada plano dé como resultado el objeto de campamento (así los reconoce), y qué jefe tira los 10 que faltan.
 - Syndicator y Auctionator de verdad: los nombres de sus APIs y la forma de lo que devuelven.
 
