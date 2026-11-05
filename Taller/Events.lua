@@ -70,6 +70,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
 		if ... == ADDON then
 			ns.InitDB()
 			frame:UnregisterEvent("ADDON_LOADED")
+			-- from here on a Lua error in a handler is kept, not thrown (see /taller errores)
+			SlashCmdList.TALLER = ns.guard.Install(frame, SlashCmdList.TALLER)
 		end
 	elseif event == "PLAYER_LOGIN" then
 		ns.Char()
@@ -112,6 +114,8 @@ SlashCmdList.TALLER = function(msg)
 		else
 			ns.Print(L.MINIMAP_USAGE)
 		end
+	elseif msg == "errores" or msg == "errors" then
+		ns.UI.Toggle("errors")
 	elseif msg == "help" or msg == "ayuda" then
 		ns.Print(L.HELP)
 	else

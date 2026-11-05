@@ -279,9 +279,12 @@ def test_the_book_its_pages_and_bookmarks(me):
         me.run("local t = {}; for k in pairs(ns.UI.frame.tabs) do t[#t + 1] = k end; return table.concat(t, ',')").split(",")
     ) == [
         "blueprints",
+        "errors",
         "profession",
         "shopping",
     ]
+    # the errors bookmark stays hidden until there is an error to show
+    assert me.run("return ns.UI.frame.tabs.errors:IsShown()") is False
     assert me.run("return ns.UI.frame.title:GetText()") == "Taller"
     assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping"
     # the page that is open is the one of the mode
@@ -696,3 +699,20 @@ def test_a_small_public_api_gives_the_shopping_list(me):
     rows = [rows[i] for i in range(1, len(rows) + 1)]
     assert rows and all(r.item and r.name and r.need >= r.missing >= 0 for r in rows)
     assert me.run("return Taller_API.VERSION") == 1
+
+
+def test_a_handler_error_is_kept_and_shown_not_thrown():
+    me = Client()
+    me.login()
+    # a broken handler inside the event frame: the game would show a popup; the guard keeps it instead
+    me.run("ns.Pins.OnTracked = function() error('se rompio la sincronizacion') end")
+    me.fire("TRACKED_RECIPE_UPDATE", 1, True)  # does not raise
+    errs = me.run("return ns.db.errors")
+    assert len(errs) == 1 and "se rompio la sincronizacion" in errs[1].message and errs[1].label == "TRACKED_RECIPE_UPDATE"
+    assert any("tuvo un error" in c or "had an error" in c for c in me.m.chat.values())
+    # the slash command is guarded too, and /taller errores opens the page with the bookmark showing
+    me.lua.globals().SlashCmdList.TALLER("errores")
+    assert me.run("return ns.UI.frame:IsShown(), ns.UI.frame.selected, ns.UI.frame.tabs.errors:IsShown()") == (True, "errors", True)
+    assert "se rompio la sincronizacion" in me.run("return ns.UI.errors.area.box._text")
+    me.run("ns.UI.errors.clear:GetScript('OnClick')()")
+    assert me.run("return #ns.db.errors") == 0

@@ -552,6 +552,18 @@ local function build()
 		end
 		UI.views[mode] = v
 	end
+	-- the addon's own errors: a brown bookmark that only shows while there is something to copy
+	local errTab = f:AddTab("errors", L.ERR_TITLE, { color = P.BOOKMARK_ACTION_COLOR })
+	errTab:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+		GameTooltip:SetText(L.ERR_TITLE)
+		GameTooltip:AddLine(L.ERR_TIP, 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	errTab:SetScript("OnLeave", GameTooltip_Hide)
+	local errPage = f:AddPage("errors")
+	UI.errors = ns.guard.Page(errPage.left, errPage.right)
+	UI.ErrorsChanged()
 	UI.Relabel()
 
 	local p = ns.db.settings.point
@@ -570,6 +582,9 @@ function UI.Relabel()
 		return
 	end
 	f:SetTitle(L.TITLE)
+	if f.tabs.errors then
+		f.tabs.errors:SetText(L.ERR_TITLE)
+	end
 	for _, mode in ipairs(UI.MODES) do
 		f.tabs[mode]:SetText(L[TAB_OF[mode]])
 		local v = UI.views[mode]
@@ -591,6 +606,18 @@ function UI.Relabel()
 	end
 end
 
+-- The errors bookmark shows only while there are errors kept; the page follows the list.
+function UI.ErrorsChanged()
+	local f = UI.frame
+	if not f or not f.tabs.errors then
+		return
+	end
+	f.tabs.errors:SetShown(#ns.guard.Errors() > 0)
+	if UI.errors then
+		UI.errors.Refresh()
+	end
+end
+
 function UI.Refresh()
 	local f = UI.frame
 	if not f or not f:IsShown() then
@@ -598,6 +625,11 @@ function UI.Refresh()
 	end
 	if f.selected ~= UI.mode then
 		f:SelectTab(UI.mode)
+	end
+	if UI.mode == "errors" then
+		f.tabs.errors:Show()
+		UI.errors.Refresh()
+		return
 	end
 	UI.rows = UI.Rows()
 	-- a pin that is gone is no longer chosen; with none chosen, the first one is

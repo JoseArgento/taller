@@ -25,6 +25,8 @@ It opens with `/taller`, with the **round minimap button** (right click: the blu
 
 **Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 48 tests in Lua 5.1 with several characters sharing the saved data and stand-ins for Syndicator and Auctionator. **In the client** (since launch): the book, pinning from the profession window, material counts across bags and bank, the shopping list, the folded blueprints and the minimap button. **Not seen yet**: that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting (so the count goes down by itself), Forever's account bank, which boss drops the 10 missing blueprints, and the real Syndicator and Auctionator APIs.
 
+**If something breaks:** `/taller errores` shows the addon's last error (the last 10 are kept, no popups) to copy into a GitHub issue. The "Errors" bookmark only shows while there is something kept.
+
 ## Support
 
 All of this is free and open source, and it stays that way: no paid features, nothing early for supporters. If it helped you and you want to cover the time it takes to keep it working (every Blizzard patch means refreshing the data and fixing what broke), you can do that on [Patreon](https://www.patreon.com/cw/DoblePupi). Thanks ♥

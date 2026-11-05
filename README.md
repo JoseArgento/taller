@@ -71,6 +71,8 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 - Los planos: que la receta que enseña cada plano dé como resultado el objeto de campamento (así los reconoce), y qué jefe tira los 10 que faltan.
 - Syndicator y Auctionator de verdad: los nombres de sus APIs y la forma de lo que devuelven.
 
+**Si algo falla:** `/taller errores` muestra el último error del addon (se guardan los últimos 10, sin popups) para copiarlo en un issue de GitHub. El marcador "Errores" aparece solo mientras hay algo guardado.
+
 ## Desarrollo
 
 ```bash
