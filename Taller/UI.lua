@@ -381,7 +381,7 @@ local function buildRecipePage(page)
 			bits[#bits + 1] = L.CRAFTER:format(ns.Short(pin.crafter))
 		end
 		local short = pinShort(pin)
-		bits[#bits + 1] = short == 0 and L.ALL_READY or L.SHORT:format(short)
+		bits[#bits + 1] = short == 0 and L.ALL_READY or short == 1 and L.SHORT_ONE or L.SHORT:format(short)
 		r.sub:SetText(table.concat(bits, " · "))
 		r.qty:SetValue(pin.qty)
 		local items = {}

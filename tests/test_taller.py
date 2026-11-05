@@ -678,3 +678,13 @@ def test_the_minimap_button_opens_the_book_and_can_be_hidden(me):
     other.lua.globals().SlashCmdList.TALLER("minimapa on")
     assert other.run("return ns.minimapButton:IsShown()")
     assert other.run("return ns.minimapButton.angle") == 45
+
+
+def test_one_material_short_is_singular(me):
+    # in the game: "45 crafts · 1 materials short"
+    me.pin(2963, 2)
+    me.run("ns.UI.Toggle()")
+    assert me.run("return ns.UI.views.profession.right.sub:GetText()").endswith("1 material short")
+    me.pin(2386, 1)
+    me.run("ns.UI.views.profession.list.box.rows[3]:GetScript('OnClick')(ns.UI.views.profession.list.box.rows[3], 'LeftButton')")
+    assert me.run("return ns.UI.views.profession.right.sub:GetText()").endswith("2 materials short")
