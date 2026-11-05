@@ -2,6 +2,8 @@
 
 ## 0.2.0 (unreleased)
 
+- **The window is an open book** (the shared Pergamino skin, vendored in `Libs/Pergamino` with its own textures and OFL fonts): bookmarks for Recipes, Shopping list and Blueprints; list on the left page, the chosen recipe or blueprint on the right; blueprint professions folded with "learned / total"; empty pages that say what to do; bookmark tooltips.
+- **Language setting**: `/taller idioma es|en|auto` picks Spanish or English whatever the client speaks (saved in `TallerDB.settings.lang`).
 - Own icon in the addon compartment and a key binding to open the window (Key Bindings → AddOns).
 - Reads **Syndicator** (or **Baganator**) when installed: other characters, guild bank, account bank and mail come from its data, labelled "via Syndicator" in the tooltip; your own bags and bank stay live. Reads **Auctionator** prices: each missing material in the shopping list shows its cost and the list shows a total, also in "Copy list". Both optional, every call guarded; their API names are unverified ⏳ (`Taller/Partners.lua`).
 - Shared helper for place names (characters, account bank, guild banks).

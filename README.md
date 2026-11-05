@@ -16,14 +16,16 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 
 ## Cómo se usa
 
+La ventana es un **libro abierto** (la piel [Pergamino](https://github.com/JoseArgento/pergamino), la misma de Bitácora y los demás addons): tres marcadores de tela en el borde, **Recetas**, **Compras** y **Planos**. En cada uno, la página de la izquierda es la lista y la de la derecha, el detalle de lo que elegiste.
+
 - **Pinear:** en la ventana de profesiones del juego, tildá la casilla para seguir la receta. Aparece sola en Taller. Si la destildás, se despinea; si la despineás en Taller, se destilda.
-- **Cantidad:** `+` y `-` en cada receta (con Shift, de a 10). La cantidad es de **objetos**: si una receta da 5 piedras por crafteo y querés 12, cuenta 3 crafteos.
-- **Materiales:** debajo de cada receta, cada material con "tenés / necesitás" y cuántos faltan. Pasando el mouse ves dónde están ("5 Josecito (bolsas), 12 Ana (banco), 3 banco de cuenta").
-- **Lista de compras:** la otra pestaña suma todo lo que piden tus recetas, con lo que más falta arriba. Si un material lo hace otra receta tuya (el paño para la camisa), te lo marca.
+- **Recetas:** a la izquierda, tus recetas pineadas por profesión; elegís una y a la derecha están sus materiales con "tenés / necesitás", cuántos faltan y dónde los tenés ("5 Josecito (bolsas), 12 Ana (banco), 3 banco de cuenta"), más la cantidad, `+` y `-` (con Shift, de a 10) y "Despinear". La cantidad es de **objetos**: si una receta da 5 piedras por crafteo y querés 12, cuenta 3 crafteos.
+- **Compras:** a la izquierda, todo lo que piden tus recetas sumado, con lo que más falta arriba (y el precio, si tenés Auctionator). Si un material lo hace otra receta tuya (el paño para la camisa), te lo marca. A la derecha, lo mismo como una línea de texto para copiar y pasar por susurro.
 - **Al craftear** baja la cantidad sola. Cuando llega a cero, te avisa y la saca.
 - **En el tooltip** de un material: "Taller: necesitás 20, tenés 3 acá y 12 en Ana".
-- **Planos de campamento:** la pestaña "Planos" muestra los 21 planos por profesión: cuáles aprendió cada uno de tus personajes, cuáles tenés guardados sin aprender, cuáles faltan, y qué jefe los tira. En el tooltip de un plano te dice si ya lo aprendió alguno de tus personajes. El juego no lleva esta cuenta. Los datos (qué jefe tira cada uno) salen de las guías de la beta; para 10 de los 21 todavía no se sabe ⏳.
-- `/taller` abre la ventana, `/taller compras` va directo a la lista de compras, `/taller planos` a los planos y `/taller copiar` te da lo que falta como texto ("15x Paño de lino, 4x Hilo grueso") para pasárselo a alguien de la guild.
+- **Planos de campamento:** el marcador "Planos" lista las profesiones, plegadas, con "aprendidos / total" en cada una; abrís una y están sus planos. Elegís uno y a la derecha dice quién de tus personajes lo aprendió, quién lo tiene guardado sin aprender, qué jefe lo tira y qué arma. En el tooltip de un plano también te dice si ya lo aprendió alguno. El juego no lleva esta cuenta. Los datos (qué jefe tira cada uno) salen de las guías de la beta; para 10 de los 21 todavía no se sabe ⏳.
+- `/taller` abre el libro, `/taller compras` va directo a la lista de compras, `/taller planos` a los planos y `/taller copiar` te da lo que falta como texto ("15x Paño de lino, 4x Hilo grueso") para pasárselo a alguien de la guild.
+- **Idioma:** sale en castellano si el cliente está en castellano. Si jugás con el cliente en inglés y lo querés en castellano igual, `/taller idioma es` (`en` lo fuerza en inglés, `auto` vuelve a seguir al juego).
 
 Las recetas son de quien las sabe hacer: si pineás algo con tu alt herrero, lo ves desde cualquier personaje ("la hace Ana").
 
@@ -57,10 +59,10 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 **Probado:**
 - ✅ Cada función, evento, template y sonido existe en Forever 1.60.1: `tools/check_api.py` contra los dumps de [Ketho/BlizzardInterfaceResources](https://github.com/Ketho/BlizzardInterfaceResources) y la UI de [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), rama `forever`. Forever usa la API de profesiones moderna (`C_TradeSkillUI.GetRecipeSchematic`, `TRACKED_RECIPE_UPDATE`) y el banco por pestañas (`Enum.BagIndex.CharacterBankTab_*`, `AccountBankTab_*`).
 - ✅ [forever-lint](https://github.com/JoseArgento/forever-lint) sin problemas; [Addon Sentry](https://github.com/JoseArgento/addon-sentry): "Sin señales de riesgo".
-- ✅ **38 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
+- ✅ **42 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
 
 **Sin probar ⏳** (no tengo el cliente de Forever):
-- Cómo se ve la ventana.
+- Cómo se ve el libro: las texturas y las fuentes (Alegreya y Cinzel, licencia OFL) van dentro del addon, en `Taller/Libs/Pergamino`.
 - Que la casilla para seguir recetas de Forever dispare `TRACKED_RECIPE_UPDATE` como en retail.
 - Que el banco de Forever use las pestañas de banco modernas y que el de cuenta exista.
 - Que `UNIT_SPELLCAST_SUCCEEDED` traiga el ID de la receta al craftear (así es en retail).

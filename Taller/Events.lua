@@ -93,6 +93,15 @@ SlashCmdList.TALLER = function(msg)
 		ns.UI.Copy()
 	elseif msg == "planos" or msg == "blueprints" then
 		ns.UI.Toggle("blueprints")
+	elseif msg:match("^idioma") or msg:match("^language") or msg:match("^lang") then
+		local code = msg:match("%s+(%a+)$")
+		if code == "es" or code == "en" or code == "auto" then
+			ns.db.settings.lang = code
+			ns.ApplyLanguage(code)
+			ns.Print(L.LANG_SET:format(L.LANG_NAMES[code]))
+		else
+			ns.Print(L.LANG_USAGE)
+		end
 	elseif msg == "help" or msg == "ayuda" then
 		ns.Print(L.HELP)
 	else

@@ -32,7 +32,7 @@ local L = {
 	UNPINNED = "Unpinned: %s.",
 	NOT_A_RECIPE = "Could not read that recipe. Open its profession once and try again.",
 	REMOVE = "Unpin",
-	HELP = "/taller opens the list. /taller compras shows the shopping list, /taller copiar gives it as text, /taller planos the blueprints. Pin recipes with the profession window's \"Track\" box.",
+	HELP = "/taller opens the book. /taller compras shows the shopping list, /taller copiar gives it as text, /taller planos the blueprints, /taller idioma es|en|auto picks the language. Pin recipes with the profession window's \"Track\" box.",
 	COMPARTMENT = "Click to open your crafting list.",
 	OTHER = "Other",
 	UNKNOWN_ITEM = "item %d",
@@ -51,6 +51,34 @@ local L = {
 	BP_TIP_LEARNED = "Taller: learned by %s",
 	BP_TIP_NONE = "Taller: none of your characters learned it",
 	BP_TIP_SOURCE = "Drops from %s (%s), per the beta",
+	QTY = "How many",
+	CRAFTS = "%d crafts",
+	SHORT = "%d materials short",
+	MATERIALS = "Materials",
+	NONE_YET = "none anywhere",
+	PICK_RECIPE = "Pick a recipe on the left page: its materials, where you have them and how many you want go here.",
+	PINNED_COUNT = "%d pinned",
+	MISSING_COUNT = "%d missing",
+	EMPTY_SHOPPING = "Nothing to buy: pin a recipe first and what is missing adds up here.",
+	COPY_TITLE = "To copy",
+	COPY_HINT = "What is missing, as one line for a whisper or a guildmate who gathers. Select it and press Ctrl+C.",
+	BP_OF = "%d of %d",
+	BP_OPEN_ONCE = "Open each profession once so the blueprints you learned count.",
+	PICK_BLUEPRINT = "Open a profession on the left page and pick a blueprint: who learned it, who carries it and who drops it go here.",
+	BP_SUB = "%s · tier %d · skill %d",
+	BP_WHO = "Learned by",
+	BP_NOBODY = "none of your characters",
+	BP_WHERE = "Carried by",
+	BP_NOT_CARRIED = "nobody",
+	BP_DROP = "Dropped by",
+	BP_BUILDS = "Builds",
+	BP_BETA = "Drop sources are from the beta and may change.",
+	TIP_RECIPES = "Your pinned recipes by profession, with their materials.",
+	TIP_SHOPPING = "Everything missing, added up and priced.",
+	TIP_BLUEPRINTS = "The 21 camping blueprints: learned, carried or missing.",
+	LANG_SET = "Language: %s. Reload the UI (/reload) for the rest of the game to notice.",
+	LANG_NAMES = { auto = "the game's", es = "castellano", en = "English" },
+	LANG_USAGE = "/taller idioma es, en or auto.",
 	PROF_ALCHEMY = "Alchemy", PROF_BLACKSMITHING = "Blacksmithing", PROF_ENCHANTING = "Enchanting",
 	PROF_ENGINEERING = "Engineering", PROF_HERBALISM = "Herbalism", PROF_LEATHERWORKING = "Leatherworking",
 	PROF_MINING = "Mining", PROF_SKINNING = "Skinning", PROF_TAILORING = "Tailoring",
@@ -88,7 +116,7 @@ local es = {
 	UNPINNED = "Despineada: %s.",
 	NOT_A_RECIPE = "No pude leer esa receta. Abrí su profesión una vez y probá de nuevo.",
 	REMOVE = "Despinear",
-	HELP = "/taller abre la lista. /taller compras muestra la lista de compras, /taller copiar te la da como texto, /taller planos los planos. Las recetas se pinean con la casilla para seguir la receta, en la ventana de profesiones.",
+	HELP = "/taller abre el libro. /taller compras muestra la lista de compras, /taller copiar te la da como texto, /taller planos los planos, /taller idioma es|en|auto elige el idioma. Las recetas se pinean con la casilla para seguir la receta, en la ventana de profesiones.",
 	COMPARTMENT = "Clic para abrir tu lista de crafteos.",
 	OTHER = "Otras",
 	UNKNOWN_ITEM = "objeto %d",
@@ -107,16 +135,68 @@ local es = {
 	BP_TIP_LEARNED = "Taller: lo aprendió %s",
 	BP_TIP_NONE = "Taller: ninguno de tus personajes lo aprendió",
 	BP_TIP_SOURCE = "Lo tira %s (%s), según la beta",
+	QTY = "Cuántos",
+	CRAFTS = "%d crafteos",
+	SHORT = "faltan %d materiales",
+	MATERIALS = "Materiales",
+	NONE_YET = "ninguno en ningún lado",
+	PICK_RECIPE = "Elegí una receta en la página de la izquierda: acá van sus materiales, dónde los tenés y cuántos querés.",
+	PINNED_COUNT = "%d pineadas",
+	MISSING_COUNT = "faltan %d",
+	EMPTY_SHOPPING = "Nada que comprar: pineá una receta primero y lo que falte se suma acá.",
+	COPY_TITLE = "Para copiar",
+	COPY_HINT = "Lo que falta, en una línea para un susurro o para alguien de la guild que junta. Seleccionalo y apretá Ctrl+C.",
+	BP_OF = "%d de %d",
+	BP_OPEN_ONCE = "Abrí cada profesión una vez para que cuenten los planos que aprendiste.",
+	PICK_BLUEPRINT = "Abrí una profesión en la página de la izquierda y elegí un plano: acá va quién lo aprendió, quién lo tiene y quién lo tira.",
+	BP_SUB = "%s · nivel %d · habilidad %d",
+	BP_WHO = "Lo aprendió",
+	BP_NOBODY = "ninguno de tus personajes",
+	BP_WHERE = "Lo tiene",
+	BP_NOT_CARRIED = "nadie",
+	BP_DROP = "Lo tira",
+	BP_BUILDS = "Arma",
+	BP_BETA = "Quién tira cada plano viene de la beta y puede cambiar.",
+	TIP_RECIPES = "Tus recetas pineadas por profesión, con sus materiales.",
+	TIP_SHOPPING = "Todo lo que falta, sumado y con precio.",
+	TIP_BLUEPRINTS = "Los 21 planos de campamento: aprendidos, en bolsas o faltantes.",
+	LANG_SET = "Idioma: %s. Recargá la interfaz (/reload) para que lo note el resto del juego.",
+	LANG_NAMES = { auto = "el del juego", es = "castellano", en = "inglés" },
+	LANG_USAGE = "/taller idioma es, en o auto.",
 	PROF_ALCHEMY = "Alquimia", PROF_BLACKSMITHING = "Herrería", PROF_ENCHANTING = "Encantamiento",
 	PROF_ENGINEERING = "Ingeniería", PROF_HERBALISM = "Herboristería", PROF_LEATHERWORKING = "Peletería",
 	PROF_MINING = "Minería", PROF_SKINNING = "Desuello", PROF_TAILORING = "Sastrería",
 	PROF_FIRSTAID = "Primeros auxilios", PROF_FISHING = "Pesca",
 }
 
-local locale = GetLocale()
-if locale == "esES" or locale == "esMX" then
-	for k, v in pairs(es) do
-		L[k] = v
+-- ns.L is a proxy: the files keep `local L = ns.L` and read through it, so the language can change after
+-- they loaded (the setting lives in TallerDB, which is only there at ADDON_LOADED; /taller idioma too).
+local active = L
+ns.L = setmetatable({}, {
+	__index = function(_, k)
+		return active[k]
+	end,
+})
+
+-- "auto" follows the game's client; "es" or "en" force one.
+function ns.ApplyLanguage(code)
+	local locale = GetLocale()
+	local spanish = code == "es" or (code ~= "en" and (locale == "esES" or locale == "esMX"))
+	if spanish then
+		local merged = {}
+		for k, v in pairs(L) do
+			merged[k] = v
+		end
+		for k, v in pairs(es) do
+			merged[k] = v
+		end
+		active = merged
+	else
+		active = L
+	end
+	ns.language = spanish and "es" or "en"
+	if ns.Fire then
+		ns.Fire("language")
 	end
 end
-ns.L = L
+ns.ApplyLanguage("auto")

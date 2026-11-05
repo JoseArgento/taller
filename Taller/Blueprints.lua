@@ -64,6 +64,16 @@ function B.ScanRecipes()
 	end
 end
 
+-- Whether any character of the account opened a profession with Taller running (so learned ones count).
+function B.AnyScanned()
+	for _, c in pairs(ns.db.chars) do
+		if c.blueprints then
+			return true
+		end
+	end
+	return false
+end
+
 -- The state of one blueprint across your characters: { learned = { "Ana-Forever" }, carried = Inventory.Count }.
 function B.State(e)
 	local learned = {}
@@ -76,19 +86,22 @@ function B.State(e)
 	return { learned = learned, carried = ns.Inventory.Count(e.item) }
 end
 
--- Rows for the tab, grouped by profession: { header } and { e, state, status, source }.
+-- Rows for the tab, grouped by profession: { header, profession, learned, count } and { e, state, status, source }.
 function B.Rows()
-	local rows, current = {}, nil
+	local rows, current, group = {}, nil, nil
 	local missing, total = 0, 0
 	for _, b in ipairs(B.LIST) do
 		local e = B.BY_ITEM[b[3]]
 		if e.profession ~= current then
 			current = e.profession
-			rows[#rows + 1] = { header = L["PROF_" .. e.profession:gsub("[^%a]", ""):upper()] or e.profession }
+			group = { header = L["PROF_" .. e.profession:gsub("[^%a]", ""):upper()] or e.profession, profession = e.profession, learned = 0, count = 0 }
+			rows[#rows + 1] = group
 		end
+		group.count = group.count + 1
 		local st = B.State(e)
 		local status
 		if #st.learned > 0 then
+			group.learned = group.learned + 1
 			local names = {}
 			for i, k in ipairs(st.learned) do
 				names[i] = ns.Short(k)

@@ -4,14 +4,16 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 
 [Leer en castellano](README.md)
 
+The window is an **open book** (the [Pergamino](https://github.com/JoseArgento/pergamino) skin shared with Bitácora and the other addons): three cloth bookmarks, **Recipes**, **Shopping list** and **Blueprints**; on each, the left page is the list and the right page the detail of what you picked.
+
 - **Pin:** in the game's profession window, tick the box to track the recipe. It shows up in Taller. Untick it and it's unpinned; unpin it in Taller and it's unticked.
-- **Quantity:** `+` and `-` on each recipe (Shift for 10). It counts **items**: if a recipe makes 5 stones per craft and you want 12, that's 3 crafts.
-- **Materials:** under each recipe, "have / need" and how many are missing. Hover to see where they are ("5 Josecito (bags), 12 Ana (bank), 3 account bank").
-- **Shopping list:** everything your recipes need, added up, most missing first. If another recipe of yours makes a material, it says so.
+- **Recipes:** your pins by profession on the left; pick one and its materials are on the right with "have / need", what is missing and where you keep them ("5 Josecito (bags), 12 Ana (bank), 3 account bank"), plus the quantity, `+` and `-` (Shift for 10) and "Unpin". It counts **items**: if a recipe makes 5 stones per craft and you want 12, that's 3 crafts.
+- **Shopping list:** everything your recipes need, added up, most missing first (priced with Auctionator when you have it). If another recipe of yours makes a material, it says so. On the right, the same as one line of text to copy into a whisper.
 - **When you craft** the quantity goes down by itself; at zero you get a message and it's unpinned.
 - **Item tooltips:** "Taller: 20 needed, 3 here, 12 on Ana".
-- **Camping blueprints:** a Blueprints tab lists all 21 by profession: which of your characters learned each, which you carry unlearned, which are missing, and who drops them (beta data; 10 sources not known yet). Blueprint tooltips say whether any of your characters learned it.
-- `/taller` opens it, `/taller planos` (or `blueprints`) the blueprints, `/taller copiar` (or `copy`) gives what is missing as text, `/taller compras` (or `shopping`) goes to the shopping list.
+- **Camping blueprints:** the Blueprints bookmark lists the professions folded, with "learned / total" on each; open one and its blueprints are there. Pick one and the right page says which of your characters learned it, who carries it unlearned, who drops it and what it builds (beta data; 10 sources not known yet). Blueprint tooltips say whether any of your characters learned it.
+- `/taller` opens the book, `/taller planos` (or `blueprints`) the blueprints, `/taller copiar` (or `copy`) gives what is missing as text, `/taller compras` (or `shopping`) goes to the shopping list.
+- **Language:** Spanish on a Spanish client. On an English client, `/taller idioma es` (or `language es`) switches it to Spanish anyway; `en` forces English, `auto` follows the game again.
 
 **What it counts:** bags (and the reagent bag) always; your bank and the account bank as you last saw them; other characters as of your last login with them. Not the mailbox or the auction house.
 
@@ -19,7 +21,7 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 
 **Why another one:** *Forever Profession Master* has a queue with quantities but only counts bags; *ItemWatch & Shopping List* counts bags and bank but not alts; *ForeverArtisan* counts alts with an extra bag addon. Taller does one thing: what you want to craft against everything you own, on every character, with nothing else needed.
 
-**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 38 tests in Lua 5.1 with several characters sharing the saved data and stand-ins for Syndicator and Auctionator. **Not tested in the game**: how the window looks, that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting, and the real Syndicator and Auctionator APIs.
+**Tested**: every API checked against Forever 1.60.1 (`tools/check_api.py`); forever-lint and Addon Sentry report nothing; 42 tests in Lua 5.1 with several characters sharing the saved data and stand-ins for Syndicator and Auctionator. **Not tested in the game**: how the book looks (textures and the OFL fonts ship inside `Taller/Libs/Pergamino`), that Forever's track box fires `TRACKED_RECIPE_UPDATE`, that Forever uses the modern bank tabs and an account bank, that `UNIT_SPELLCAST_SUCCEEDED` carries the recipe ID when crafting, and the real Syndicator and Auctionator APIs.
 
 ## Support
 

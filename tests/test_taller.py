@@ -73,6 +73,10 @@ class Client:
         c = self.m.chat
         return [c[i] for i in range(1, len(c) + 1)]
 
+    def lua_rows(self, expr):
+        r = self.run("return " + expr)
+        return [r[i] for i in range(1, len(r) + 1)]
+
     def rows(self):
         r = self.ns.UI.Rows()
         out = []
@@ -264,20 +268,105 @@ def test_the_window(me):
     assert [k for k, _, _ in me.rows()] == ["reagent"]
 
 
-def test_plus_and_minus(me):
+def test_the_book_its_pages_and_bookmarks(me):
     me.pin(2963, 2)
     me.run("ns.UI.Toggle()")
-    pin = me.pins()[0]
-    me.ns.Pins.SetQty(pin, pin.qty + 1)
-    assert me.pins()[0].qty == 3
-    me.run("MOCK.shift = true")
-    me.ns.Pins.SetQty(pin, pin.qty + 10)
-    assert me.pins()[0].qty == 13
+    f = me.ns.UI.frame
+    # a Pergamino book: leather, two pages, spine, title banner, wax seal, three bookmarks
+    assert f.leather and f.pageL and f.pageR and f.spine and f.banner and f.close
+    assert str(f.leather.texture).endswith("Taller\\Libs\\Pergamino\\Media\\leather")
+    assert sorted(
+        me.run("local t = {}; for k in pairs(ns.UI.frame.tabs) do t[#t + 1] = k end; return table.concat(t, ',')").split(",")
+    ) == [
+        "blueprints",
+        "profession",
+        "shopping",
+    ]
+    assert me.run("return ns.UI.frame.title:GetText()") == "Taller"
+    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping list"
+    # the page that is open is the one of the mode
+    assert me.run("return ns.UI.frame.selected") == "profession"
+    assert me.run("return ns.UI.frame.pages.profession.left:IsShown()") and not me.run("return ns.UI.frame.pages.shopping.left:IsShown()")
+    # a bookmark click turns the page and changes the mode
+    me.run("ns.UI.frame.tabs.shopping:GetScript('OnClick')(ns.UI.frame.tabs.shopping)")
+    assert me.ns.UI.mode == "shopping" and me.run("return ns.UI.frame.pages.shopping.left:IsShown()")
+    # the bookmark tooltip says what is inside
+    me.run("GameTooltip.lines = {}; ns.UI.frame.tabs.shopping:GetScript('OnEnter')(ns.UI.frame.tabs.shopping)")
+    assert "added up and priced" in me.run("return table.concat(GameTooltip.lines, '\\n')")
+    # the wax seal closes it
+    me.run("ns.UI.frame.close:GetScript('OnClick')()")
+    assert not f.IsShown(f)
 
 
-def test_empty_message(me):
+def test_recipes_page_lists_pins_on_the_left_and_the_chosen_one_on_the_right(me):
+    me.pin(2963, 2)
+    me.pin(2386, 1)
+    me.put(0, 2589, 10)
+    me.bags_changed()
     me.run("ns.UI.Toggle()")
-    assert me.run("return ns.UI.frame.empty:IsShown()")
+    left = [(r.kind, r.pin and r.pin.name or r.text) for r in me.lua_rows("ns.UI.left")]
+    assert left == [("header", "Tailoring"), ("pin", "Bolt of Linen Cloth"), ("pin", "Brown Linen Shirt")]
+    # the first pin is chosen by default; its materials fill the right page
+    assert me.run("return ns.UI.pin.name") == "Bolt of Linen Cloth"
+    right = me.ns.UI.views.profession.right
+    assert me.run("return ns.UI.views.profession.right.title:GetText()") == "Bolt of Linen Cloth"
+    assert "2 crafts" in me.run("return ns.UI.views.profession.right.sub:GetText()")
+    mats = me.lua_rows("ns.UI.views.profession.right.list.box.data")
+    assert [m.item for m in mats] == [2589]
+    assert me.run("return ns.UI.views.profession.right.qty:GetText()") == "2"
+    # clicking the other pin on the left shows it on the right
+    me.run("ns.UI.views.profession.list.box.rows[3]:GetScript('OnClick')(ns.UI.views.profession.list.box.rows[3], 'LeftButton')")
+    assert me.run("return ns.UI.pin.name") == "Brown Linen Shirt"
+    assert me.run("return ns.UI.views.profession.right.title:GetText()") == "Brown Linen Shirt"
+    assert [m.item for m in me.lua_rows("ns.UI.views.profession.right.list.box.data")] == [2996, 2320]
+    # + and - and the unpin act on the chosen one
+    me.run("ns.UI.views.profession.right.plus:GetScript('OnClick')()")
+    assert me.ns.Pins.Find(2386)[0].qty == 2
+    me.run("ns.UI.views.profession.right.remove:GetScript('OnClick')()")
+    assert me.ns.Pins.Find(2386) is None and me.run("return ns.UI.pin.name") == "Bolt of Linen Cloth"
+    assert right is not None
+
+
+def test_shopping_page_is_a_ledger_with_the_text_to_copy(me):
+    me.pin(2963, 2)
+    me.run("ns.UI.Toggle('shopping')")
+    assert [r.kind for r in me.lua_rows("ns.UI.left")] == ["reagent"]
+    assert me.run("return ns.UI.views.shopping.count:GetText()") == "1 missing"
+    assert me.run("return ns.UI.views.shopping.right.text") == "4x Linen Cloth"
+    assert me.run("return ns.UI.views.shopping.right.area.box:GetEditBox():GetText()") == "4x Linen Cloth"
+
+
+def test_empty_pages_invite(me):
+    me.run("ns.UI.Toggle()")
+    assert me.run("return ns.UI.views.profession.empty:IsShown()")
+    assert "Nothing pinned yet" in me.run("return ns.UI.views.profession.empty:GetText()")
+    assert not me.run("return ns.UI.views.profession.list.box:IsShown()")
+    assert "Pick a recipe" in me.run("return ns.UI.views.profession.right.empty:GetText()")
+    me.run("ns.UI.Toggle('shopping')")
+    assert "Nothing to buy" in me.run("return ns.UI.views.shopping.empty:GetText()")
+    me.pin(2963, 2)
+    assert not me.run("return ns.UI.views.shopping.empty:IsShown()") and me.run("return ns.UI.views.shopping.list.box:IsShown()")
+
+
+def test_language_can_be_chosen_whatever_the_client_speaks(me):
+    assert me.run("return ns.language") == "en"
+    me.lua.globals().SlashCmdList.TALLER("idioma es")
+    assert me.run("return ns.language") == "es" and me.run("return TallerDB.settings.lang") == "es"
+    assert me.chat()[-1].endswith("Idioma: castellano. Recargá la interfaz (/reload) para que lo note el resto del juego.")
+    me.pin(2963, 2)
+    assert "faltan 4" in next(right for kind, _, right in me.rows() if kind == "reagent")
+    me.run("ns.UI.Toggle()")
+    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Lista de compras"
+    me.lua.globals().SlashCmdList.TALLER("idioma en")
+    assert me.run("return ns.UI.frame.tabs.shopping:GetText()") == "Shopping list"
+    me.lua.globals().SlashCmdList.TALLER("idioma klingon")
+    assert "es, en or auto" in me.chat()[-1]
+    # the setting survives a login, and "auto" follows the client
+    saved = me.save()
+    c = Client(locale="esES", saved=saved).login()
+    assert c.run("return ns.language") == "en"
+    c.lua.globals().SlashCmdList.TALLER("idioma auto")
+    assert c.run("return ns.language") == "es"
 
 
 def test_spanish():
@@ -355,6 +444,39 @@ def test_blueprint_tab_and_tooltip(me):
     )
     lines = me.run("return table.concat(GameTooltip.lines, '\\n')")
     assert "none of your characters learned it" in lines and "Gilnid (The Deadmines)" in lines
+
+
+def test_blueprint_page_folds_professions_and_shows_the_chosen_one(me):
+    me.run("ns.UI.Toggle('blueprints')")
+    left = me.lua_rows("ns.UI.left")
+    # nothing scanned yet: the hint, then the eleven professions folded (no blueprints visible)
+    assert left[0].kind == "note" and "Open each profession once" in left[0].text
+    assert [r.kind for r in left[1:]] == ["header"] * 11 and all(not r.open for r in left[1:])
+    assert me.run("return ns.UI.views.blueprints.count:GetText()") == "0 of 21"
+    assert "Pick a blueprint" in me.run("return ns.UI.views.blueprints.right.empty:GetText()") or "pick a blueprint" in me.run(
+        "return ns.UI.views.blueprints.right.empty:GetText()"
+    )
+    # unfold Blacksmithing by clicking its row
+    me.run("ns.UI.views.blueprints.list.box.rows[3]:GetScript('OnClick')(ns.UI.views.blueprints.list.box.rows[3], 'LeftButton')")
+    left = me.lua_rows("ns.UI.left")
+    assert left[2].kind == "header" and left[2].profession == "Blacksmithing" and left[2].open
+    assert [r.kind for r in left[3:5]] == ["bp", "bp"] and left[5].kind == "header"
+    # choose the Anvil: the right page tells who learned it, who carries it and who drops it
+    me.run("ns.UI.views.blueprints.list.box.rows[4]:GetScript('OnClick')(ns.UI.views.blueprints.list.box.rows[4], 'LeftButton')")
+    r = me.ns.UI.views.blueprints.right
+    assert me.run("return ns.UI.views.blueprints.right.title:GetText()") == "Anvil"
+    assert me.run("return ns.UI.views.blueprints.right.sub:GetText()") == "Blacksmithing · tier 2 · skill 140"
+    bodies = [me.run(f"return ns.UI.views.blueprints.right.lines[{i}].body:GetText()") for i in range(1, 5)]
+    assert bodies[0] == "none of your characters" and bodies[1] == "nobody" and bodies[2] == "Gilnid, The Deadmines"
+    assert r is not None
+    # once a profession was scanned, the hint goes away and the count follows
+    me.run("MOCK.recipes[9999] = { name = 'Anvil', output = 279988, per = 1, profession = 'Blacksmithing', reagents = {} }")
+    me.fire("TRADE_SKILL_LIST_UPDATE")
+    me.m.runTimers()
+    left = me.lua_rows("ns.UI.left")
+    assert left[0].kind == "header"
+    assert me.run("return ns.UI.views.blueprints.count:GetText()") == "1 of 21"
+    assert me.run("return ns.UI.views.blueprints.right.lines[1].body:GetText()").endswith("learned: Josecito|r")
 
 
 def test_blueprints_in_spanish():

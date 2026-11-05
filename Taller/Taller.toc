@@ -13,6 +13,7 @@
 ## AddonCompartmentFuncOnLeave: Taller_OnAddonCompartmentLeave
 ## Category: Professions
 
+Libs\Pergamino\Pergamino.lua
 Locales.lua
 Core.lua
 Partners.lua
