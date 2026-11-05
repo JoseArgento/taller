@@ -688,3 +688,11 @@ def test_one_material_short_is_singular(me):
     me.pin(2386, 1)
     me.run("ns.UI.views.profession.list.box.rows[3]:GetScript('OnClick')(ns.UI.views.profession.list.box.rows[3], 'LeftButton')")
     assert me.run("return ns.UI.views.profession.right.sub:GetText()").endswith("2 materials short")
+
+
+def test_a_small_public_api_gives_the_shopping_list(me):
+    me.pin(2386, 3)
+    rows = me.run("return Taller_API.ShoppingList()")
+    rows = [rows[i] for i in range(1, len(rows) + 1)]
+    assert rows and all(r.item and r.name and r.need >= r.missing >= 0 for r in rows)
+    assert me.run("return Taller_API.VERSION") == 1

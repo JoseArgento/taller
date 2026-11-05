@@ -97,3 +97,19 @@ function ns.Ago(seconds)
 end
 
 ns.ADDON = ADDON
+
+-- A small public API for other addons (Trueque uses it): the shopping list as plain data, nothing else.
+-- Each entry: { item = itemID, name = item name, need = total wanted, have = owned, missing = still to get }.
+Taller_API = {
+	VERSION = 1,
+	ShoppingList = function()
+		local out = {}
+		if not ns.db or not ns.Pins then
+			return out
+		end
+		for _, s in ipairs(ns.Pins.Shopping()) do
+			out[#out + 1] = { item = s.item, name = ns.ItemName(s.item), need = s.need, have = s.have.total, missing = s.missing }
+		end
+		return out
+	end,
+}
