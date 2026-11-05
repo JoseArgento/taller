@@ -2,6 +2,7 @@
 
 ## 0.2.0 (unreleased)
 
+- **Minimap button** (Pergamino 2): left click opens the book, right click the blueprints, drag it around the minimap; `/taller minimapa on|off` shows or hides it (`TallerDB.settings.minimap`, angle in `minimapAngle`). Pergamino 2 also brings one-line bookmarks and scroll bars only when needed.
 - Recipes: the quantity field always shows the real quantity (it could keep what you typed while + and - changed the pin); what you type applies on Enter or when you leave the field; bigger + and - buttons; "1 craft" in singular. Shorter bookmarks (Recipes, Shopping, Blueprints). Blueprint rows on the left page are short (name and tier) with a seal for learned / carried / missing; skill and drop stay on the right page.
 - **The window is an open book** (the shared Pergamino skin, vendored in `Libs/Pergamino` with its own textures and OFL fonts): bookmarks for Recipes, Shopping list and Blueprints; list on the left page, the chosen recipe or blueprint on the right; blueprint professions folded with "learned / total"; empty pages that say what to do; bookmark tooltips.
 - **Language setting**: `/taller idioma es|en|auto` picks Spanish or English whatever the client speaks (saved in `TallerDB.settings.lang`).

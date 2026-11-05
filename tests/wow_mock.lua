@@ -1,5 +1,6 @@
--- A small stand-in for the WoW client, enough to load Taller (and the Pergamino library) and drive its events in Lua 5.1.
--- That every global and method Taller calls exists in Forever is checked separately (tools/check_api.py).
+-- A small stand-in for the WoW client, enough to load Bitácora and drive its events in Lua 5.1.
+-- It does not draw anything: widget methods that only affect the screen are accepted and recorded.
+-- That every global and method Bitácora calls exists in Forever is checked separately (tools/check_api.py).
 
 MOCK = {
 	events = {},       -- event -> list of frames
@@ -309,6 +310,18 @@ end
 function Frame:SetHeight(h)
 	self.height = h
 end
+function Frame:GetCenter()
+	return self._cx or 0, self._cy or 0
+end
+function Frame:GetEffectiveScale()
+	return self._scale or 1
+end
+function Frame:SetMask(path)
+	self.mask = path
+end
+function Frame:SetCursorPosition(n)
+	self._cursor = n
+end
 function Frame:GetHeight()
 	return self.height or 100
 end
@@ -355,6 +368,9 @@ function Frame:SetDataProvider(provider)
 			self.rows[i] = row
 			self.view.init(row, item)
 		end
+	end
+	if self.managedBar and self.view then
+		self.managedBar:SetShown(#self.data * (self.view.extent or 0) > self:GetHeight())
 	end
 end
 function Frame:ForEachFrame(fn)
@@ -414,6 +430,11 @@ function CreateFrame(kind, name, parent, template)
 end
 
 UIParent = newObject("Frame", "UIParent")
+Minimap = newObject("Frame", "Minimap")
+Minimap.width, Minimap.height, Minimap._cx, Minimap._cy = 140, 140, 1000, 500
+function GetCursorPosition()
+	return MOCK.cursorX or 0, MOCK.cursorY or 0
+end
 GameTooltip = newObject("GameTooltip", "GameTooltip")
 ItemRefTooltip = newObject("GameTooltip", "ItemRefTooltip")
 DEFAULT_CHAT_FRAME = newObject("ScrollingMessageFrame", "ChatFrame1")
@@ -513,6 +534,10 @@ ScrollUtil = {
 		box.view = view
 	end,
 	RegisterScrollBoxWithScrollBar = function() end,
+	-- like the client's: the bar shows only while the rows overflow the box (checked when data is set)
+	AddManagedScrollBarVisibilityBehavior = function(box, bar)
+		box.managedBar = bar
+	end,
 }
 function PanelTemplates_SetNumTabs(f, n)
 	f.numTabs = n

@@ -73,6 +73,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 		end
 	elseif event == "PLAYER_LOGIN" then
 		ns.Char()
+		ns.MinimapButton()
 		ns.Partners.Init()
 		Inv.ScanBags()
 		ns.Pins.SyncTracked()
@@ -102,11 +103,43 @@ SlashCmdList.TALLER = function(msg)
 		else
 			ns.Print(L.LANG_USAGE)
 		end
+	elseif msg:match("^minimap") then
+		local what = msg:match("%s+(%a+)$")
+		if what == "on" or what == "off" then
+			ns.db.settings.minimap = what == "on"
+			ns.MinimapButton()
+			ns.Print(ns.db.settings.minimap and L.MINIMAP_ON or L.MINIMAP_OFF)
+		else
+			ns.Print(L.MINIMAP_USAGE)
+		end
 	elseif msg == "help" or msg == "ayuda" then
 		ns.Print(L.HELP)
 	else
 		ns.UI.Toggle()
 	end
+end
+
+-- The round button on the minimap's edge (Pergamino): left click opens the book, right click the blueprints.
+-- Made once; the setting shows or hides it.
+function ns.MinimapButton()
+	if not ns.minimapButton then
+		ns.minimapButton = Pergamino.MinimapButton("TallerMinimapButton", {
+			icon = "Interface\\AddOns\\" .. ADDON .. "\\Media\\icon",
+			angle = ns.db.settings.minimapAngle,
+			onMove = function(angle)
+				ns.db.settings.minimapAngle = angle
+			end,
+			onClick = function(button)
+				ns.UI.Toggle(button == "RightButton" and "blueprints" or nil)
+			end,
+			tooltip = function(tip)
+				tip:SetText(L.TITLE)
+				tip:AddLine(L.MINIMAP_TIP, 1, 1, 1, true)
+			end,
+		})
+	end
+	ns.minimapButton:SetShown(ns.db.settings.minimap ~= false)
+	return ns.minimapButton
 end
 
 function Taller_OnAddonCompartmentClick()

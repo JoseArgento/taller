@@ -5,7 +5,8 @@ local L = ns.L
 --   chars[Name-Realm] = { bags = { [itemID] = n }, bank = { [itemID] = n }, bankSeen = time }
 --   warband = { items = { [itemID] = n }, seen = time }       the account bank, the same for everyone
 --   pins = { { recipe, qty, crafter, profession, name, output, per, reagents = { { item, n } }, at } }
---   settings = { tooltip = true, lang = "auto" | "es" | "en", point = where the book was left }
+--   settings = { tooltip = true, lang = "auto" | "es" | "en", point = where the book was left,
+--                minimap = true (show the minimap button), minimapAngle = where it sits around the minimap }
 
 local listeners = {}
 function ns.On(topic, fn)
@@ -34,6 +35,9 @@ function ns.InitDB()
 	end
 	if db.settings.lang ~= "es" and db.settings.lang ~= "en" then
 		db.settings.lang = "auto"
+	end
+	if db.settings.minimap == nil then
+		db.settings.minimap = true
 	end
 	ns.db = db
 	ns.ApplyLanguage(db.settings.lang)

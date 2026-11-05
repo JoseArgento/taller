@@ -16,7 +16,7 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 
 ## Cómo se usa
 
-La ventana es un **libro abierto** (la piel [Pergamino](https://github.com/JoseArgento/pergamino), la misma de Bitácora y los demás addons): tres marcadores de tela en el borde, **Recetas**, **Compras** y **Planos**. En cada uno, la página de la izquierda es la lista y la de la derecha, el detalle de lo que elegiste.
+Se abre con `/taller`, con el **botón redondo del minimapa** (clic derecho: los planos; se arrastra alrededor del minimapa y `/taller minimapa off` lo esconde), con el atajo de teclado o desde el compartimento de addons. La ventana es un **libro abierto** (la piel [Pergamino](https://github.com/JoseArgento/pergamino), la misma de Bitácora y los demás addons): tres marcadores de tela en el borde, **Recetas**, **Compras** y **Planos**. En cada uno, la página de la izquierda es la lista y la de la derecha, el detalle de lo que elegiste.
 
 - **Pinear:** en la ventana de profesiones del juego, tildá la casilla para seguir la receta. Aparece sola en Taller. Si la destildás, se despinea; si la despineás en Taller, se destilda.
 - **Recetas:** a la izquierda, tus recetas pineadas por profesión; elegís una y a la derecha están sus materiales con "tenés / necesitás", cuántos faltan y dónde los tenés ("5 Josecito (bolsas), 12 Ana (banco), 3 banco de cuenta"), más la cantidad, `+` y `-` (con Shift, de a 10) y "Despinear". La cantidad es de **objetos**: si una receta da 5 piedras por elaboración y querés 12, cuenta 3 elaboraciones. La cantidad se aplica con Enter o al salir del campo.

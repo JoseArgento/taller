@@ -655,3 +655,26 @@ def test_prices_in_spanish():
     c.login()
     c.pin(2963, 1)
     assert c.ns.UI.ShoppingText() == "2x Linen Cloth ~2s 0c. Lo que falta sale unos 2s 0c, según Auctionator."
+
+
+def test_the_minimap_button_opens_the_book_and_can_be_hidden(me):
+    b = me.run("return ns.minimapButton")
+    assert b is not None and me.run("return ns.minimapButton:IsShown()")
+    assert me.run("return TallerDB.settings.minimap") is True
+    # left click opens the book, right click opens it on the blueprints
+    me.run("ns.minimapButton:GetScript('OnClick')(ns.minimapButton, 'LeftButton')")
+    assert me.run("return ns.UI.frame:IsShown()") and me.ns.UI.mode == "profession"
+    me.run("ns.minimapButton:GetScript('OnClick')(ns.minimapButton, 'LeftButton')")
+    assert not me.run("return ns.UI.frame:IsShown()")
+    me.run("ns.minimapButton:GetScript('OnClick')(ns.minimapButton, 'RightButton')")
+    assert me.run("return ns.UI.frame:IsShown()") and me.ns.UI.mode == "blueprints"
+    # the angle is kept across sessions; the slash hides and shows it
+    me.run("ns.minimapButton:SetAngle(45); ns.minimapButton:GetScript('OnDragStop')(ns.minimapButton)")
+    assert me.run("return TallerDB.settings.minimapAngle") == 45
+    me.lua.globals().SlashCmdList.TALLER("minimapa off")
+    assert not me.run("return ns.minimapButton:IsShown()") and me.chat()[-1].endswith("/taller minimapa on brings it back.")
+    other = Client("Josecito", saved=me.save()).login()
+    assert not other.run("return ns.minimapButton:IsShown()")
+    other.lua.globals().SlashCmdList.TALLER("minimapa on")
+    assert other.run("return ns.minimapButton:IsShown()")
+    assert other.run("return ns.minimapButton.angle") == 45

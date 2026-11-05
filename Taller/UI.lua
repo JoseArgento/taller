@@ -296,7 +296,7 @@ local function buildRecipePage(page)
 		if UI.pin then
 			ns.Pins.SetQty(UI.pin, tonumber(self:GetText()) or UI.pin.qty)
 			if r.qty then
-				r.qty:SetText(tostring(UI.pin.qty))
+				r.qty:SetValue(UI.pin.qty)
 			end
 		end
 	end
@@ -383,7 +383,7 @@ local function buildRecipePage(page)
 		local short = pinShort(pin)
 		bits[#bits + 1] = short == 0 and L.ALL_READY or L.SHORT:format(short)
 		r.sub:SetText(table.concat(bits, " · "))
-		r.qty:SetText(tostring(pin.qty))
+		r.qty:SetValue(pin.qty)
 		local items = {}
 		for _, n in ipairs(ns.Pins.Needs(pin)) do
 			items[#items + 1] = { kind = "reagent", item = n.item, need = n.need, have = n.have }
