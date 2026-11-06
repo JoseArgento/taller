@@ -61,7 +61,7 @@ Ya hay addons de profesiones para Forever, y algunos están muy buenos. *Forever
 **Probado:**
 - ✅ Cada función, evento, template y sonido existe en Forever 1.60.1: `tools/check_api.py` contra los dumps de [Ketho/BlizzardInterfaceResources](https://github.com/Ketho/BlizzardInterfaceResources) y la UI de [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), rama `forever`. Forever usa la API de profesiones moderna (`C_TradeSkillUI.GetRecipeSchematic`, `TRACKED_RECIPE_UPDATE`) y el banco por pestañas (`Enum.BagIndex.CharacterBankTab_*`, `AccountBankTab_*`).
 - ✅ [forever-lint](https://github.com/JoseArgento/forever-lint) sin problemas; [Addon Sentry](https://github.com/JoseArgento/addon-sentry): "Sin señales de riesgo".
-- ✅ **48 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
+- ✅ **52 tests** en Lua 5.1 (el Lua de WoW), con varios personajes de la misma cuenta compartiendo los datos guardados, y con dobles de Syndicator y Auctionator (presentes, ausentes, tirando errores o devolviendo cualquier cosa).
 
 **En el cliente** (desde el lanzamiento): el libro, pinear una receta desde la ventana de profesiones, la cuenta de materiales en bolsas y banco, la lista de compras, los planos plegados y el botón del minimapa.
 
