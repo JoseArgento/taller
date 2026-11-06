@@ -6,7 +6,7 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 
 ![Taller in the game: a pinned recipe with its materials](docs/libro.png)
 
-It opens with `/taller`, with the **round minimap button** (right click: the blueprints; drag it around the minimap, `/taller minimapa off` hides it), with the key binding or from the addon compartment. The window is an **open book** (the [Pergamino](https://github.com/JoseArgento/pergamino) skin shared with Bitácora and the other addons): three cloth bookmarks, **Recipes**, **Shopping** and **Blueprints**; on each, the left page is the list and the right page the detail of what you picked.
+It opens with `/taller`, with the **round minimap button** (right click: the blueprints; drag it around the minimap, `/taller minimapa off` hides it; `/taller minimap merge on` puts the whole family into one button with a menu), with the key binding or from the addon compartment. The window is an **open book** (the [Pergamino](https://github.com/JoseArgento/pergamino) skin shared with Bitácora and the other addons): three cloth bookmarks, **Recipes**, **Shopping** and **Blueprints**; on each, the left page is the list and the right page the detail of what you picked.
 
 - **Pin:** in the game's profession window, tick the box to track the recipe. It shows up in Taller. Untick it and it's unpinned; unpin it in Taller and it's unticked.
 - **Recipes:** your pins by profession on the left; pick one and its materials are on the right with "have / need", what is missing and where you keep them ("5 Josecito (bags), 12 Ana (bank), 3 account bank"), plus the quantity, `+` and `-` (Shift for 10) and "Unpin". It counts **items**: if a recipe makes 5 stones per craft and you want 12, that's 3 crafts.

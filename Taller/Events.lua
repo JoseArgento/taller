@@ -106,6 +106,13 @@ onSlash = function(msg)
 		else
 			ns.Print(L.LANG_USAGE)
 		end
+	elseif msg:match("^minimapa%s+juntar") or msg:match("^minimap%s+merge") then
+		local what = msg:match("%s+(%a+)$")
+		if what == "on" or what == "off" then
+			ns.SetMinimapMerged(what == "on")
+		else
+			ns.SetMinimapMerged(not ns.db.settings.minimapMerged)
+		end
 	elseif msg:match("^minimap") then
 		local what = msg:match("%s+(%a+)$")
 		if what == "on" or what == "off" then
@@ -126,6 +133,8 @@ end
 SlashCmdList.TALLER = onSlash
 
 -- The round button on the minimap's edge (Pergamino): left click opens the book, right click the blueprints.
+-- Registered in the family's hub (settings.minimapMerged = one button for every addon that shares the lib);
+-- its clicks go through the guard, so an error is kept, not thrown.
 -- Made once; the setting shows or hides it.
 function ns.MinimapButton()
 	if not ns.minimapButton then
@@ -135,21 +144,41 @@ function ns.MinimapButton()
 			onMove = function(angle)
 				ns.db.settings.minimapAngle = angle
 			end,
-			onClick = function(button)
-				ns.UI.Toggle(button == "RightButton" and "blueprints" or nil)
+			onClick = function()
+				ns.UI.Toggle()
+			end,
+			onRightClick = function()
+				ns.UI.Toggle("blueprints")
 			end,
 			tooltip = function(tip)
 				tip:SetText(L.TITLE)
 				tip:AddLine(L.MINIMAP_TIP, 1, 1, 1, true)
 			end,
+			guard = ns.guard,
+			hub = { addon = L.TITLE, label = L.TITLE, order = 4 },
 		})
+		if ns.db.settings.minimapMerged ~= nil then
+			Pergamino.MinimapHub.SetMerged(ns.db.settings.minimapMerged)
+		end
 	end
 	ns.minimapButton:SetShown(ns.db.settings.minimap ~= false)
 	return ns.minimapButton
 end
 
+-- /taller minimapa juntar on|off: one button for the whole family (the lib keeps it for every addon)
+function ns.SetMinimapMerged(merged)
+	ns.db.settings.minimapMerged = merged and true or false
+	Pergamino.MinimapHub.SetMerged(merged)
+	ns.Print(merged and L.MINIMAP_MERGED_ON or L.MINIMAP_MERGED_OFF)
+end
+
+-- the addon compartment is not a frame, so its click is wrapped by hand (an error is kept, not thrown)
 function Taller_OnAddonCompartmentClick()
-	ns.UI.Toggle()
+	if ns.guard then
+		ns.guard.Wrap(ns.UI.Toggle, "compartment")()
+	else
+		ns.UI.Toggle()
+	end
 end
 function Taller_OnAddonCompartmentEnter(_, button)
 	GameTooltip:SetOwner(button, "ANCHOR_LEFT")

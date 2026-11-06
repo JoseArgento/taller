@@ -716,3 +716,24 @@ def test_a_handler_error_is_kept_and_shown_not_thrown():
     assert "se rompio la sincronizacion" in me.run("return ns.UI.errors.area.box._text")
     me.run("ns.UI.errors.clear:GetScript('OnClick')()")
     assert me.run("return #ns.db.errors") == 0
+
+
+def test_merging_the_minimap_buttons_hides_ours_and_the_hub_lists_it(me):
+    entries = me.run("return Pergamino.MinimapHub.Entries()")
+    assert [e.label for e in entries.values()] == ["Taller"]
+    me.lua.globals().SlashCmdList.TALLER("minimapa juntar on")
+    assert me.run("return TallerDB.settings.minimapMerged") is True and me.run("return Pergamino.MinimapHub.IsMerged()") is True
+    assert not me.run("return ns.minimapButton:IsShown()")
+    assert me.run("return PergaminoMinimapHub:IsShown()")
+    other = Client("Josecito", saved=me.save()).login()
+    assert other.run("return Pergamino.MinimapHub.IsMerged()") is True
+    other.lua.globals().SlashCmdList.TALLER("minimap merge off")
+    assert other.run("return ns.minimapButton:IsShown()")
+
+
+def test_an_error_in_the_minimap_click_or_the_compartment_is_kept(me):
+    me.run("ns.UI.Toggle = function() error('se rompio el taller') end")
+    me.run("ns.minimapButton:GetScript('OnClick')(ns.minimapButton, 'LeftButton')")
+    me.run("Taller_OnAddonCompartmentClick()")
+    errs = me.run("return ns.guard.Errors()")
+    assert sorted(e.label for e in errs.values()) == ["compartment", "minimap"]

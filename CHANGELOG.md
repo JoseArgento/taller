@@ -2,6 +2,7 @@
 
 ## 0.2.0 (unreleased)
 
+- **Minimap button like the game's** (Pergamino 7): gold bevelled ring, dark disc, shadow, a cream icon; `/taller minimapa juntar on|off` puts every addon of the family into one button with a menu. Errors in the minimap button and the addon compartment are kept too (`/taller errores`).
 - **Its own errors, kept** (Pergamino 5): a Lua error in a handler no longer reaches the player as a popup; it is kept in `TallerDB.errors` (last 10), said once in the chat, and `/taller errores` opens a page to copy it into a GitHub issue. An "Errores" bookmark appears while there is something kept.
 - **Minimap button** (Pergamino 2): left click opens the book, right click the blueprints, drag it around the minimap; `/taller minimapa on|off` shows or hides it (`TallerDB.settings.minimap`, angle in `minimapAngle`). Pergamino 2 also brings one-line bookmarks and scroll bars only when needed.
 - Recipes: the quantity field always shows the real quantity (it could keep what you typed while + and - changed the pin); what you type applies on Enter or when you leave the field; bigger + and - buttons; "1 craft" in singular. Shorter bookmarks (Recipes, Shopping, Blueprints). Blueprint rows on the left page are short (name and tier) with a seal for learned / carried / missing; skill and drop stay on the right page.
