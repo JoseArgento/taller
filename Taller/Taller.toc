@@ -5,6 +5,7 @@
 ## Notes-esMX: Pineá recetas con cuántas querés hacer: suma los materiales y cuenta lo que tenés en bolsas, banco y otros personajes, por profesión.
 ## Author: José Argento
 ## Version: @project-version@
+## X-Curse-Project-ID: 1787068
 ## SavedVariables: TallerDB
 ## OptionalDeps: Syndicator, Baganator, Auctionator
 ## IconTexture: Interface\AddOns\Taller\Media\icon
