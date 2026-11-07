@@ -6,6 +6,8 @@ For crafters in **WoW Forever**. Pin recipes, say how many you want to make, and
 
 ![Taller in the game: a pinned recipe with its materials](docs/libro.png)
 
+**Download:** on [CurseForge](https://www.curseforge.com/wow/addons/taller) (also through the CurseForge app or WowUp) or the zip from the [releases](https://github.com/JoseArgento/taller/releases).
+
 It opens with `/taller`, with the **round minimap button** (right click: the blueprints; drag it around the minimap, `/taller minimapa off` hides it; `/taller minimap merge on` puts the whole family into one button with a menu), with the key binding or from the addon compartment. The window is an **open book** (the [Pergamino](https://github.com/JoseArgento/pergamino) skin shared with Bitácora and the other addons): three cloth bookmarks, **Recipes**, **Shopping** and **Blueprints**; on each, the left page is the list and the right page the detail of what you picked.
 
 - **Pin:** in the game's profession window, tick the box to track the recipe. It shows up in Taller. Untick it and it's unpinned; unpin it in Taller and it's unticked.

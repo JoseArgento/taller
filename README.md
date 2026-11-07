@@ -6,6 +6,8 @@ Para los que craftean en **WoW Forever**. Pineás recetas, ponés cuántas quer�
 
 ![Taller en el juego: una receta pineada con sus materiales](docs/libro.png)
 
+**Descargar:** en [CurseForge](https://www.curseforge.com/wow/addons/taller) (también con la app de CurseForge o WowUp) o el zip de las [releases](https://github.com/JoseArgento/taller/releases).
+
 **Contenido**
 
 - [Cómo se usa](#cómo-se-usa)
