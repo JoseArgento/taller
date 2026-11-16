@@ -2,7 +2,9 @@ local _, ns = ...
 local L = ns.L
 
 -- Pinned recipes. A pin is one recipe for one character (the one who knows it), with how many items you
--- want. The reagents are read from the game when you pin it and kept, so your alts can see them too.
+-- want. The reagents are read from the game when you pin it and kept, so your alts can see them too, and
+-- read again at every login, when a profession opens and when the book opens (P.RefreshAll): Blizzard
+-- changes recipes in hotfixes (November 2026: the tailoring bags went from 4 bolts to 5).
 
 local P = {}
 ns.Pins = P
@@ -79,6 +81,52 @@ function P.Pin(recipeID, qty, quiet)
 	end
 	ns.Fire("pins")
 	return pin
+end
+
+local function sameReagents(a, b)
+	if #a ~= #b then
+		return false
+	end
+	for i, r in ipairs(a) do
+		if r.item ~= b[i].item or r.n ~= b[i].n then
+			return false
+		end
+	end
+	return true
+end
+
+-- Reads the recipe of a pin again. True when what the game says now is not what the pin had (the pin is
+-- updated and pin.changed says when). A recipe the game cannot describe right now leaves the pin alone.
+function P.Refresh(pin)
+	local r = P.ReadRecipe(pin.recipe)
+	-- nothing read, or a half-loaded schematic (a name but no reagents where there were some): not now
+	if not r or (#r.reagents == 0 and #(pin.reagents or {}) > 0) then
+		return false
+	end
+	local changed = pin.per ~= r.per or pin.output ~= r.output or not sameReagents(pin.reagents or {}, r.reagents)
+	pin.name, pin.output, pin.per, pin.reagents = r.name, r.output, r.per, r.reagents
+	pin.checked = time()
+	if changed then
+		pin.changed = time()
+	end
+	return changed
+end
+
+-- Every pin, whoever crafts it (a recipe reads the same from any character). Says which ones changed.
+function P.RefreshAll(quiet)
+	local names = {}
+	for _, pin in ipairs(ns.db.pins) do
+		if P.Refresh(pin) then
+			names[#names + 1] = pin.name
+		end
+	end
+	if #names > 0 then
+		if not quiet then
+			ns.Print(L.RECIPES_UPDATED:format(table.concat(names, ", ")))
+		end
+		ns.Fire("pins")
+	end
+	return #names
 end
 
 function P.Unpin(pin)

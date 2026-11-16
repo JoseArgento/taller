@@ -425,7 +425,7 @@ def bp_rows(c):
 
 def test_blueprints_start_missing(me):
     rows = bp_rows(me)
-    assert len(rows) == 21
+    assert len(rows) == 26
     assert all("missing" in s for s in rows.values())
 
 
@@ -463,14 +463,14 @@ def test_blueprint_tab_and_tooltip(me):
     me.lua.globals().SlashCmdList.TALLER("planos")
     assert me.ns.UI.mode == "blueprints"
     kinds = [k for k, _, _ in me.rows()]
-    assert kinds[0] == "note" and kinds.count("header") == 11 and kinds.count("bp") == 21
+    assert kinds[0] == "note" and kinds.count("header") == 12 and kinds.count("bp") == 26
     # the left page is short (name and tier, state as a tag); skill and the drop live on the right page
     first = next(left for kind, left, _ in me.rows() if kind == "bp")
     assert first.strip() == "Fermenter · tier 2"
     rows = me.lua_rows("ns.UI.Rows()")
     firstbp = next(r for r in rows if r.kind == "bp")
     assert firstbp.bp.state == "missing" and "Rath'mael, Ruins of Lordaeron" in firstbp.bp.source
-    unknown = next(r for r in rows if r.kind == "bp" and r.bp.e.name == "Alchemy Laboratory")
+    unknown = next(r for r in rows if r.kind == "bp" and r.bp.e.name == "Seed Hybridizer")
     assert "drop not known yet" in unknown.bp.source
     me.run(
         "GameTooltip.lines = {}; for _, fn in ipairs(MOCK.tooltipCalls[Enum.TooltipDataType.Item]) do fn(GameTooltip, { id = 273086 }) end"
@@ -484,8 +484,8 @@ def test_blueprint_page_folds_professions_and_shows_the_chosen_one(me):
     left = me.lua_rows("ns.UI.left")
     # nothing scanned yet: the hint, then the eleven professions folded (no blueprints visible)
     assert left[0].kind == "note" and "Open each profession once" in left[0].text
-    assert [r.kind for r in left[1:]] == ["header"] * 11 and all(not r.open for r in left[1:])
-    assert me.run("return ns.UI.views.blueprints.count:GetText()") == "0 of 21"
+    assert [r.kind for r in left[1:]] == ["header"] * 12 and all(not r.open for r in left[1:])
+    assert me.run("return ns.UI.views.blueprints.count:GetText()") == "0 of 26"
     assert "Pick a blueprint" in me.run("return ns.UI.views.blueprints.right.empty:GetText()") or "pick a blueprint" in me.run(
         "return ns.UI.views.blueprints.right.empty:GetText()"
     )
@@ -508,7 +508,7 @@ def test_blueprint_page_folds_professions_and_shows_the_chosen_one(me):
     me.m.runTimers()
     left = me.lua_rows("ns.UI.left")
     assert left[0].kind == "header"
-    assert me.run("return ns.UI.views.blueprints.count:GetText()") == "1 of 21"
+    assert me.run("return ns.UI.views.blueprints.count:GetText()") == "1 of 26"
     assert me.run("return ns.UI.views.blueprints.right.lines[1].body:GetText()").endswith("learned: Josecito|r")
 
 
@@ -737,3 +737,82 @@ def test_an_error_in_the_minimap_click_or_the_compartment_is_kept(me):
     me.run("Taller_OnAddonCompartmentClick()")
     errs = me.run("return ns.guard.Errors()")
     assert sorted(e.label for e in errs.values()) == ["compartment", "minimap"]
+
+
+def test_taller_stays_inside_the_hub_when_another_addon_merged_the_family_first():
+    # The bug: Bitácora (loaded first) had merged the buttons; Taller made its own at login and showed it
+    # again with SetShown(settings.minimap), so it sat outside the one button.
+    me = Client()
+    me.run("Pergamino.MinimapHub.Choose(true)")  # what Bitácora's option does, before Taller's login
+    me.login()
+    assert me.run("return TallerDB.settings.minimap") is not False
+    assert me.run("return ns.minimapButton:IsShown()") is False
+    assert me.run("return PergaminoMinimapHub:IsShown()") is True
+    # and the choice is now in Taller's own saved variables too, so it holds without Bitácora
+    assert me.run("return TallerDB.settings.minimapMerged") is True
+    alone = Client("Josecito", saved=me.save()).login()
+    assert alone.run("return Pergamino.MinimapHub.IsMerged(), ns.minimapButton:IsShown()") == (True, False)
+    # /taller minimapa on while merged does not pull it out either
+    alone.lua.globals().SlashCmdList.TALLER("minimapa on")
+    assert alone.run("return ns.minimapButton:IsShown()") is False
+    alone.lua.globals().SlashCmdList.TALLER("minimapa juntar off")
+    assert alone.run("return ns.minimapButton:IsShown()") is True
+
+
+def test_a_recipe_blizzard_changed_is_read_again_at_login():
+    # 11 November 2026: the tailoring bags went from 4 bolts to 5. A pin kept the 4 it read the day it was pinned.
+    me = Client().login()
+    me.pin(2386, 2)
+    saved = me.save()
+    later = Client("Josecito", saved=saved)
+    later.run("MOCK.recipes[2386].reagents = { { 2996, 2 }, { 2320, 1 } }")  # the hotfix
+    later.login()
+    pin = later.pins()[0]
+    assert [(pin.reagents[i].item, pin.reagents[i].n) for i in (1, 2)] == [(2996, 2), (2320, 1)]
+    assert pin.changed and pin.checked and pin.qty == 2
+    assert any("Brown Linen Shirt" in c and ("changed" in c or "cambió" in c) for c in later.chat())
+    # the shopping list follows, and the recipe page says so
+    assert later.shopping()[2996][0] == 4
+    later.run("ns.UI.Toggle('profession')")
+    assert "updated on" in later.run("return ns.UI.views.profession.right.sub:GetText()")
+
+
+def test_an_alts_pin_is_refreshed_too_and_nothing_is_said_when_nothing_changed():
+    alt = Client("Anita").login()
+    alt.pin(2660, 5)
+    me = Client("Josecito", saved=alt.save())
+    me.login()
+    assert not any("changed" in c or "cambió" in c for c in me.chat())
+    assert me.pins()[0].changed is None and me.pins()[0].checked
+    # the hotfix arrives while playing: opening the book reads the recipes again
+    me.run("MOCK.recipes[2660].per = 1")
+    me.run("ns.UI.Toggle()")
+    assert me.pins()[0].per == 1 and me.pins()[0].crafter == "Anita-Forever" and me.pins()[0].changed
+
+
+def test_a_recipe_the_game_cannot_describe_right_now_keeps_the_pin():
+    me = Client().login()
+    me.pin(2386, 1)
+    # not cached yet: an empty schematic, or a name with no reagents
+    me.run("MOCK.saved = MOCK.recipes[2386]; MOCK.recipes[2386] = nil")
+    assert me.run("return ns.Pins.RefreshAll()") == 0 and len(me.pins()[0].reagents) == 2
+    me.run("MOCK.recipes[2386] = { name = 'Brown Linen Shirt', output = 2580, per = 1, profession = 'Tailoring', reagents = {} }")
+    assert me.run("return ns.Pins.RefreshAll()") == 0 and len(me.pins()[0].reagents) == 2
+    assert me.pins()[0].changed is None
+
+
+def test_the_blueprint_table_follows_the_november_hotfixes(me):
+    by_name = {}
+    lst = me.ns.Blueprints.LIST
+    for i in range(1, len(lst) + 1):
+        by_name[lst[i][2]] = lst[i]
+    # 6 Nov: Tanning Rack 140 → 125; 10 Nov: Journeyman Campfire Kit 140 → 90
+    assert by_name["Tanning Rack"][6] == 125 and by_name["Journeyman Campfire"][6] == 90
+    # cooking and the fishing hut were missing; no item or camp object appears twice
+    assert {"Cookie's Feast", "Expert Campfire", "Iron Oven", "Fishing Hut"} <= set(by_name)
+    items = [b[3] for b in by_name.values()] + [b[4] for b in by_name.values()]
+    assert len(items) == len(set(items)) == 52
+    # a second known source is said after the first; an unknown one says so
+    e = me.ns.Blueprints.BY_ITEM[273109]
+    assert me.ns.Blueprints.Source(e) == "The Beast, Upper Blackrock Spire (also Houndmaster Loksey, Scarlet Monastery)"
+    assert "not known" in me.ns.Blueprints.Source(me.ns.Blueprints.BY_ITEM[273120])

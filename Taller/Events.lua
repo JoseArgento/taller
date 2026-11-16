@@ -27,6 +27,7 @@ local function scanSoon()
 	C_Timer.After(1, function()
 		scanPending = false
 		ns.Blueprints.ScanRecipes()
+		ns.Pins.RefreshAll() -- the profession's data is loaded now: the pins read their recipes again
 	end)
 end
 
@@ -80,6 +81,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
 		ns.Partners.Init()
 		Inv.ScanBags()
 		ns.Pins.SyncTracked()
+		ns.Pins.RefreshAll()
 		for e in pairs(handlers) do
 			frame:RegisterEvent(e)
 		end
@@ -157,9 +159,8 @@ function ns.MinimapButton()
 			guard = ns.guard,
 			hub = { addon = L.TITLE, label = L.TITLE, order = 4 },
 		})
-		if ns.db.settings.minimapMerged ~= nil then
-			Pergamino.MinimapHub.SetMerged(ns.db.settings.minimapMerged)
-		end
+		-- the family's choice (one button for all) lives in every addon's settings: the hub reads and keeps it
+		Pergamino.MinimapHub.Bind(ns.db.settings)
 	end
 	ns.minimapButton:SetShown(ns.db.settings.minimap ~= false)
 	return ns.minimapButton
@@ -167,8 +168,7 @@ end
 
 -- /taller minimapa juntar on|off: one button for the whole family (the lib keeps it for every addon)
 function ns.SetMinimapMerged(merged)
-	ns.db.settings.minimapMerged = merged and true or false
-	Pergamino.MinimapHub.SetMerged(merged)
+	Pergamino.MinimapHub.Choose(merged) -- saved by the hub in every addon's settings
 	ns.Print(merged and L.MINIMAP_MERGED_ON or L.MINIMAP_MERGED_OFF)
 end
 

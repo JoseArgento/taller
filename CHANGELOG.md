@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (unreleased)
+
+- **Pinned recipes stay up to date.** A pin kept the materials it read the day you pinned it; Blizzard changes recipes in hotfixes (11 November 2026: the tailoring bags went from 4 bolts to 5), so old pins showed the old numbers. Now every pin reads its recipe again at login, when a profession window opens and when the book opens. When one changed, the chat says which, and its page says "the game changed this recipe: materials updated on 11/11" for two weeks. A recipe the game cannot describe at that moment leaves the pin as it was.
+- **Blueprints, checked on 16 November:** 26 instead of 21 (Cooking was missing: Journeyman Campfire, Cookie's Feast, Expert Campfire, Iron Oven; and the Fishing Hut). Drop sources for the tier 3 ones (the level 60 dungeons were not in the beta); only the Seed Hybridizer is still unknown ⏳. Skills follow the hotfixes: Tanning Rack 125 (was 140), Journeyman Campfire 90 (was 140). A second known source is shown too ("also Houndmaster Loksey, Scarlet Monastery").
+- **The button no longer stays outside the family's one minimap button** (Pergamino 8). With "one button for the family" chosen in another addon, Taller showed its own button again at login. The choice is now saved in every addon of the family (it holds whichever ones are enabled) and the merged button remembers where you dragged it.
+
 ## 0.2.0 (2026-11-07)
 
 - **Minimap button like the game's** (Pergamino 7): gold bevelled ring, dark disc, shadow, a cream icon; `/taller minimapa juntar on|off` puts every addon of the family into one button with a menu. Errors in the minimap button and the addon compartment are kept too (`/taller errores`).

@@ -378,7 +378,12 @@ local function buildRecipePage(page)
 		end
 		local short = pinShort(pin)
 		bits[#bits + 1] = short == 0 and L.ALL_READY or short == 1 and L.SHORT_ONE or L.SHORT:format(short)
-		r.sub:SetText(table.concat(bits, " · "))
+		local sub = table.concat(bits, " · ")
+		-- Blizzard changed this recipe after you pinned it: said here for two weeks
+		if pin.changed and time() - pin.changed < 14 * 86400 then
+			sub = sub .. "\n|cff8f2a1d" .. L.RECIPE_CHANGED:format(date("%d/%m", pin.changed)) .. "|r"
+		end
+		r.sub:SetText(sub)
 		r.qty:SetValue(pin.qty)
 		local items = {}
 		for _, n in ipairs(ns.Pins.Needs(pin)) do
@@ -480,7 +485,7 @@ local function buildBlueprintPage(page)
 			who = L.BP_NOBODY
 		end
 		local carried = st.carried.total > 0 and whereText(st.carried) or L.BP_NOT_CARRIED
-		local source = e.boss and L.BP_SOURCE:format(e.boss, e.where) or L.BP_SOURCE_UNKNOWN
+		local source = ns.Blueprints.Source(e)
 		local texts = {
 			{ L.BP_WHO, who },
 			{ L.BP_WHERE, carried },
@@ -680,10 +685,14 @@ function UI.Toggle(mode)
 	if mode then
 		UI.mode = mode
 		f:Show()
+		ns.Pins.RefreshAll()
 		UI.Refresh()
 		return
 	end
 	f:SetShown(not f:IsShown())
+	if f:IsShown() then
+		ns.Pins.RefreshAll() -- opening the book: the pins read their recipes again (Blizzard changes them)
+	end
 end
 
 ns.On("pins", UI.Refresh)
