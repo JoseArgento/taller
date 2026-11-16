@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 (unreleased)
+## 0.3.0 (2026-11-16)
 
 - **Pinned recipes stay up to date.** A pin kept the materials it read the day you pinned it; Blizzard changes recipes in hotfixes (11 November 2026: the tailoring bags went from 4 bolts to 5), so old pins showed the old numbers. Now every pin reads its recipe again at login, when a profession window opens and when the book opens. When one changed, the chat says which, and its page says "the game changed this recipe: materials updated on 11/11" for two weeks. A recipe the game cannot describe at that moment leaves the pin as it was.
 - **Blueprints, checked on 16 November:** 26 instead of 21 (Cooking was missing: Journeyman Campfire, Cookie's Feast, Expert Campfire, Iron Oven; and the Fishing Hut). Drop sources for the tier 3 ones (the level 60 dungeons were not in the beta); only the Seed Hybridizer is still unknown ⏳. Skills follow the hotfixes: Tanning Rack 125 (was 140), Journeyman Campfire 90 (was 140). A second known source is shown too ("also Houndmaster Loksey, Scarlet Monastery").
